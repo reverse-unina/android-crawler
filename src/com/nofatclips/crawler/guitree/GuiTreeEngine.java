@@ -25,7 +25,9 @@ public class GuiTreeEngine extends Engine {
 
 	public GuiTreeEngine () {
 		super ();
-				
+		//prova branch con linee di codice insignificanti
+		int a=5;
+		a=a+5;
 		setScheduler(new TraceDispatcher());
 		
 		this.theAutomation = new Automation();
