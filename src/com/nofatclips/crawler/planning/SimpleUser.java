@@ -29,16 +29,17 @@ public class SimpleUser implements EventHandler, InputHandler {
 		setAbstractor(a);
 	}
 	
-	@SuppressWarnings("unused")
 	@Override
 	public Collection<UserEvent> handleEvent(WidgetState w) {
 		ArrayList<UserEvent> events = new ArrayList<UserEvent>();
 		
 		// Code to handle ListViews
 		if (w.getSimpleType().equals(LIST_VIEW)) {
-			Log.d("nofatclips", "Handling event on ListView id=" + w.getId() + " count=" + w.getCount() + " name=" + w.getName());
-			for (int i=1; i<=w.getCount(); i++) {
-//			for (int i=1; i<=1; i++) {
+			int fromItem = 1; // int fromItem = Math.min(6,w.getCount());
+			int toItem = Math.min (fromItem + MAX_EVENTS_PER_WIDGET - 1, w.getCount());
+			
+			Log.d("nofatclips", "Handling events [" + fromItem + "," + toItem + "] on ListView id=" + w.getId() + " count=" + w.getCount() + " name=" + w.getName());
+			for (int i=fromItem; i<=toItem; i++) {
 				UserEvent event = getAbstractor().createEvent(w, LIST_SELECT);
 				event.setValue(String.valueOf(i));
 				events.add(event);

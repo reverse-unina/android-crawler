@@ -13,6 +13,7 @@ import com.nofatclips.crawler.filters.FormFilter;
 import com.nofatclips.crawler.filters.SimpleEventFilter;
 import com.nofatclips.crawler.model.Filter;
 import com.nofatclips.crawler.planning.SimplePlanner;
+import com.nofatclips.crawler.planning.SimpleStrategyPlanner;
 import com.nofatclips.crawler.planning.SimpleUser;
 import com.nofatclips.crawler.planning.TraceDispatcher;
 import com.nofatclips.crawler.storage.DiskPersistence;
@@ -62,7 +63,10 @@ public class GuiTreeEngine extends Engine {
 		p.setUser(user);
 		p.setFormFiller(user);
 		p.setAbstractor(this.guiAbstractor);
-		setPlanner (p);
+		
+		SimpleStrategyPlanner sp=new SimpleStrategyPlanner();
+		sp.addPlanner(p);
+		setStrategyPlanner (sp);
 		
 		setStrategy(new SimpleStrategy (COMPARATOR));
 		if (MAX_NUM_TRACES>0) {

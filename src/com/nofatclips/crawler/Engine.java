@@ -9,7 +9,7 @@ import com.nofatclips.crawler.model.ActivityDescription;
 import com.nofatclips.crawler.model.Extractor;
 import com.nofatclips.crawler.model.Persistence;
 import com.nofatclips.crawler.model.Plan;
-import com.nofatclips.crawler.model.Planner;
+import com.nofatclips.crawler.model.StrategyPlanner;
 import com.nofatclips.crawler.model.Robot;
 import com.nofatclips.crawler.model.Strategy;
 import com.nofatclips.crawler.planning.TraceDispatcher;
@@ -62,12 +62,12 @@ public abstract class Engine extends ActivityInstrumentationTestCase2 {
 	}
 
 	private void planFirstTests (ActivityState theActivity) {
-		Plan thePlan = getPlanner().getPlanForBaseActivity(theActivity);
+		Plan thePlan = getStrategyPlanner().getPlanForBaseActivity(theActivity);
 		planTests (null, thePlan);
 	}
 	
 	private void planTests (Trace theTask, ActivityState theActivity) {
-		Plan thePlan = getPlanner().getPlanForActivity(theActivity); // numTabs=1 => Ignore TabHost
+		Plan thePlan = getStrategyPlanner().getPlanForActivity(theActivity); // numTabs=1 => Ignore TabHost
 		planTests (theTask, thePlan);
 	}
 	
@@ -103,12 +103,12 @@ public abstract class Engine extends ActivityInstrumentationTestCase2 {
 		this.theAbstractor = theAbstractor;
 	}
 
-	public Planner getPlanner() {
-		return this.thePlanner;
+	public StrategyPlanner getStrategyPlanner() {
+		return this.theStrategyPlanner;
 	}
 
-	public void setPlanner(Planner thePlanner) {
-		this.thePlanner = thePlanner;
+	public void setStrategyPlanner(StrategyPlanner theStrategyPlanner) {
+		this.theStrategyPlanner = theStrategyPlanner;
 	}
 	
 	public TraceDispatcher getScheduler () {
@@ -152,7 +152,7 @@ public abstract class Engine extends ActivityInstrumentationTestCase2 {
 	private Robot theRobot;
 	private Extractor theExtractor;
 	private Abstractor theAbstractor;
-	private Planner thePlanner;
+	private StrategyPlanner theStrategyPlanner;
 	private TraceDispatcher theScheduler;
 	private Strategy theStrategy;
 	private Persistence thePersistence;

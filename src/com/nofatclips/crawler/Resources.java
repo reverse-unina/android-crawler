@@ -105,6 +105,7 @@ public class Resources {
 //	public final static boolean EVENT_WHEN_NO_ID = true; // Whether to inject events on widgets without ID or not
 
 	public final static int MAX_NUM_TRACES = 100;
+	public final static int MAX_EVENTS_PER_WIDGET = 40;
 	public final static boolean BACK_BUTTON_EVENT = true;
 	public final static boolean SCROLL_DOWN_EVENT = false;
 	public final static CrawlerLog LOGGER = new SessionLogger();

@@ -38,6 +38,7 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 	private TabHost	tabs; // Reference to the TabHost widget if present
 	private int tabNum; // Number of tabs used by the Activity
 	private Robot theRobot;
+	private UserEvent currentEvent;
 		
 	// A Trivial Extractor is provided if none is assigned
 	public Automation () {
@@ -92,6 +93,7 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 
 	@Override
 	public void fireEvent(UserEvent e) {
+		this.currentEvent = e;
 		String eventType = e.getType();
 		if (eventType.equals(BACK) || eventType.equals(SCROLL_DOWN)) { // Special events
 			Log.d("nofatclips", "Firing event: type= " + eventType);
@@ -160,6 +162,7 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 			TouchUtils.clickView(test, v);
 		} else if (eventType == BACK) {
 			solo.goBack();
+			home();
 		} else if (eventType == SCROLL_DOWN) {
 			solo.scrollDown();
 		} else if (eventType == SWAP_TAB && value!=null) {
@@ -178,6 +181,17 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 		extractState();
 	}
 
+	public void home () {
+		final ArrayList<ListView> viewList = solo.getCurrentListViews();
+		if (viewList.size() > 0) {
+			getActivity().runOnUiThread(new Runnable() {
+				public void run() {
+					viewList.get(0).setSelection(0);
+				}
+			});
+		}
+	}
+	
 	private void refreshCurrentActivity() {
 		this.theActivity = solo.getCurrentActivity();
 		Log.i("nofatclips", "Current activity is " + getActivity().getLocalClassName());
@@ -218,7 +232,7 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 		final int n = Math.min(l.getCount(), Math.max(1,num))-1;
 		l.requestFocus();
 		Log.i("nofatclips", "Swapping to listview item " + num);
-//		solo.sendKey(Solo.DOWN);
+		solo.sendKey(Solo.DOWN);
 		getActivity().runOnUiThread(new Runnable() {
 			public void run() {
 				l.setSelection(n);
@@ -232,7 +246,12 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 			solo.sendKey(Solo.UP);			
 			solo.sendKey(Solo.DOWN);
 		}
-		TouchUtils.clickView(test, l.getSelectedView());
+		this.test.getInstrumentation().waitForIdleSync();
+		View v = l.getSelectedView();
+		TouchUtils.clickView(test, v);
+		if (v instanceof TextView) {
+			this.currentEvent.setDescription(((TextView)v).getText().toString());
+		}
 	}
 
 	public void clearWidgetList() {
