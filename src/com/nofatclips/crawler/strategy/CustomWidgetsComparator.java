@@ -36,6 +36,10 @@ public class CustomWidgetsComparator extends NameComparator {
 		}
 		return false;
 	}
+	
+	protected boolean matchWidget (WidgetState campo, WidgetState altroCampo) {
+		return altroCampo.getId().equals(campo.getId());
+	}
 
 	public boolean compare(ActivityState current, ActivityState stored) {
 		if (byName && !super.compare(current,stored)) return false; // Different name, different activity, early return
@@ -53,7 +57,7 @@ public class CustomWidgetsComparator extends NameComparator {
 				Log.v("nofatclips","Comparing " + type + " #" + id);
 				boolean trovato = false;
 				for (WidgetState altroCampo: stored) {
-					if (altroCampo.getId().equals(campo.getId())) {
+					if (matchWidget (altroCampo, campo)) {
 						trovato = true;
 						break;
 					}
@@ -74,7 +78,7 @@ public class CustomWidgetsComparator extends NameComparator {
 				Log.v("nofatclips","Comparing " + type + " #" + id);
 				boolean trovato = false;
 				for (WidgetState altroCampo: current) {
-					if (altroCampo.getId().equals(campo.getId())) {
+					if (matchWidget(altroCampo, campo)) {
 						trovato = true;
 						break;
 					}

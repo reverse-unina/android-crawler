@@ -75,7 +75,7 @@ public class Resources {
 //	public final static String PACKAGE_NAME = "com.example.android.apis";
 //	public final static String CLASS_NAME = "com.example.android.apis.ApiDemos";
 //	public final static String FILE_NAME = "apidemos.xml"; // Output
-//	public final static Comparator COMPARATOR = new EditTextComparator();
+//	public final static Comparator COMPARATOR = new CustomWidgetsDeepComparator(TEXT_VIEW);
 //	public final static int SLEEP_AFTER_EVENT = 200;
 //	public final static int SLEEP_AFTER_RESTART = 2000;
 //	public final static boolean EVENT_WHEN_NO_ID = true; // Whether to inject events on widgets without ID or not 

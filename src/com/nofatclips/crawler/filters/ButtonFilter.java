@@ -6,7 +6,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 
-public class ButtonFilter extends ListFilter {
+public class ButtonFilter extends ArrayListFilter {
 
 	@Override
 	public boolean isValidItem(View v) {

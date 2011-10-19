@@ -5,7 +5,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-public class FormFilter extends ListFilter {
+public class FormFilter extends ArrayListFilter {
 
 	@Override
 	public boolean isValidItem(View v) {

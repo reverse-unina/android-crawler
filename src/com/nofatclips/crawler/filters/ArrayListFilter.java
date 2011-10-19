@@ -8,9 +8,9 @@ import android.view.View;
 import com.nofatclips.androidtesting.model.WidgetState;
 import com.nofatclips.crawler.model.Filter;
 
-public abstract class ListFilter implements Filter {
+public abstract class ArrayListFilter implements Filter {
 
-	public ListFilter () {
+	public ArrayListFilter () {
 		super ();
 	}
 	

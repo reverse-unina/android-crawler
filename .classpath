@@ -7,7 +7,7 @@
 	<classpathentry kind="lib" path="/Android Test/src/com/nofatclips/androidtesting/guitree" sourcepath="/Android Test/src/com/nofatclips/androidtesting/guitree"/>
 	<classpathentry kind="lib" path="/Android Test/src/com/nofatclips/androidtesting/model" sourcepath="/Android Test/src/com/nofatclips/androidtesting/model"/>
 	<classpathentry kind="lib" path="/Android Test/src/com/nofatclips/androidtesting/xml" sourcepath="/Android Test/src/com/nofatclips/androidtesting/xml"/>
-	<classpathentry kind="lib" path="C:/Users/mm/Desktop/ING.SW/new_workspace/Crawler/robotium-solo-2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Francesco/Specialistica/Tirocinio/ProgettoAndroid/Crawler/robotium-solo-2.3.jar"/>
 	<classpathentry kind="src" path="/Android Test"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

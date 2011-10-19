@@ -33,8 +33,24 @@ public class SimpleUser implements EventHandler, InputHandler {
 	@Override
 	public Collection<UserEvent> handleEvent(WidgetState w) {
 		ArrayList<UserEvent> events = new ArrayList<UserEvent>();
-		if (!useForEvent(w)) return events;
+		
+		// Code to handle ListViews
+		if (w.getSimpleType().equals(LIST_VIEW)) {
+			Log.d("nofatclips", "Handling event on ListView id=" + w.getId() + " count=" + w.getCount() + " name=" + w.getName());
+			for (int i=1; i<=w.getCount(); i++) {
+//			for (int i=1; i<=1; i++) {
+				UserEvent event = getAbstractor().createEvent(w, LIST_SELECT);
+				event.setValue(String.valueOf(i));
+				events.add(event);
+			}
+			return events;
+		}
+		
+		// Return empty if don't know how to click
+		if (!useForClick(w)) return events;
 		if ( (w.getId().equals("-1"))  && (!EVENT_WHEN_NO_ID || (w.getName().equals("")) )) return events;
+
+		// Plan a click on this widget
 		Log.d("nofatclips", "Handling event on widget id=" + w.getId() + " type=" + w.getSimpleType() + " name=" + w.getName());
 		UserEvent event = getAbstractor().createEvent(w, CLICK);
 		events.add(event);
@@ -57,12 +73,14 @@ public class SimpleUser implements EventHandler, InputHandler {
 		return null;
 	}
 
-	protected boolean useForEvent (WidgetState w) {
+	protected boolean useForClick (WidgetState w) {
+		if (!w.isAvailable()) return false;
 		return (w.getSimpleType().equals(BUTTON));
 	}
 
 	protected boolean useForInput (WidgetState w) {
-		if (useForEvent(w)) return false;
+		if (useForClick(w)) return false;
+		if (!w.isAvailable()) return false;
 		return ( (w.getSimpleType().equals(EDIT_TEXT) || w.getSimpleType().equals(RADIO) || w.getSimpleType().equals(CHECKBOX)) && !w.getId().equals("-1"));
 	}
 	
