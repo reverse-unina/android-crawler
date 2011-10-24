@@ -104,12 +104,15 @@ public class Resources {
 //	public final static int SLEEP_AFTER_RESTART = 2000;
 //	public final static boolean EVENT_WHEN_NO_ID = true; // Whether to inject events on widgets without ID or not
 
-	public final static int MAX_NUM_TRACES = 100;
-	public final static int MAX_EVENTS_PER_WIDGET = 40;
+	public final static int MAX_NUM_TRACES = 13; // After performing this amount of traces, the crawler exits
+	public final static int MAX_TRACES_IN_RAM = 0; // After performing this amount of traces, the crawler saves to disk, empties the session and continues (0 = keep all in RAM)
+	public final static int MAX_EVENTS_PER_WIDGET = 1;
 	public final static boolean BACK_BUTTON_EVENT = true;
 	public final static boolean SCROLL_DOWN_EVENT = false;
+	public final static String XML_BODY_BEGIN = "    <TRACE";
+	public final static String XML_BODY_END = "/TRACE>";
 	public final static CrawlerLog LOGGER = new SessionLogger();
-	
+
 	public static Class<?> theClass;
 	static {
 		try {

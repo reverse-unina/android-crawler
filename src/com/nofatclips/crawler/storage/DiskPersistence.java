@@ -35,6 +35,14 @@ public class DiskPersistence implements Persistence {
 		this.theSession = s;
 	}
 	
+	public Session getSession() {
+		return this.theSession;
+	}
+
+	public String getFileName () {
+		return this.fileName;
+	}
+	
 	public void setContext(Activity a) {
 		this.w = new ContextWrapper(a);
 	}
@@ -49,8 +57,7 @@ public class DiskPersistence implements Persistence {
 		save (this.fileName);
 	}
 	
-	private void save (String fileName) {
-		
+	protected String generate () {
 		// Generate text
 		String graph = "";
 		try {
@@ -66,11 +73,18 @@ public class DiskPersistence implements Persistence {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return graph;
+	}
+	
+	protected void save (String fileName) {
 		
+		// Generate text
+		String graph = generate();
+
 		// Write text to disk
-		createFile();
+		openFile(fileName);
 		try {
-			this.osw.write(graph);
+			writeOnFile (graph);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -79,9 +93,13 @@ public class DiskPersistence implements Persistence {
 		}
 	}
 	
-	public void createFile () {
+	public void writeOnFile (String graph) throws IOException {
+		this.osw.write(graph);
+	}
+	
+	public void openFile (String fileName) {
 		try{
-			this.fOut = w.openFileOutput(this.fileName, ContextWrapper.MODE_PRIVATE);
+			this.fOut = w.openFileOutput(fileName, this.mode);
 			this.osw = new OutputStreamWriter(fOut);
 		}
 		catch (Exception e) {
@@ -109,5 +127,6 @@ public class DiskPersistence implements Persistence {
     ContextWrapper w = null;
 	private String fileName;
 	private Session theSession;
+	protected int mode = ContextWrapper.MODE_PRIVATE;
 
 }

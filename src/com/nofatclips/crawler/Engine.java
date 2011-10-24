@@ -9,7 +9,7 @@ import com.nofatclips.crawler.model.ActivityDescription;
 import com.nofatclips.crawler.model.Extractor;
 import com.nofatclips.crawler.model.Persistence;
 import com.nofatclips.crawler.model.Plan;
-import com.nofatclips.crawler.model.StrategyPlanner;
+import com.nofatclips.crawler.model.Planner;
 import com.nofatclips.crawler.model.Robot;
 import com.nofatclips.crawler.model.Strategy;
 import com.nofatclips.crawler.planning.TraceDispatcher;
@@ -45,29 +45,29 @@ public abstract class Engine extends ActivityInstrumentationTestCase2 {
 			ActivityState theActivity = getAbstractor().createActivity(d);
 			if (!getStrategy().checkForTransition(theActivity)) continue;
 			theTask.setFinalActivity (theActivity);
-			getSession().addTrace(theTask);
+			getPersistence().addTrace(theTask);
 			if (theActivity.getId() == "exit") continue;
 			if (!getStrategy().compareState(theActivity)) {
 				planTests(theTask, theActivity);
 			}
 			if (getStrategy().checkForTermination(theActivity)) break;
 		}
-		getPersistence().save();
 	}
 	
 	@Override
 	protected void tearDown() throws Exception {
+		getPersistence().save();
 		getRobot().finalize();
 		super.tearDown();
 	}
 
 	private void planFirstTests (ActivityState theActivity) {
-		Plan thePlan = getStrategyPlanner().getPlanForBaseActivity(theActivity);
+		Plan thePlan = getPlanner().getPlanForBaseActivity(theActivity);
 		planTests (null, thePlan);
 	}
 	
 	private void planTests (Trace theTask, ActivityState theActivity) {
-		Plan thePlan = getStrategyPlanner().getPlanForActivity(theActivity); // numTabs=1 => Ignore TabHost
+		Plan thePlan = getPlanner().getPlanForActivity(theActivity); // numTabs=1 => Ignore TabHost
 		planTests (theTask, thePlan);
 	}
 	
@@ -103,12 +103,12 @@ public abstract class Engine extends ActivityInstrumentationTestCase2 {
 		this.theAbstractor = theAbstractor;
 	}
 
-	public StrategyPlanner getStrategyPlanner() {
-		return this.theStrategyPlanner;
+	public Planner getPlanner() {
+		return this.thePlanner;
 	}
 
-	public void setStrategyPlanner(StrategyPlanner theStrategyPlanner) {
-		this.theStrategyPlanner = theStrategyPlanner;
+	public void setPlanner(Planner thePlanner) {
+		this.thePlanner = thePlanner;
 	}
 	
 	public TraceDispatcher getScheduler () {
@@ -152,7 +152,7 @@ public abstract class Engine extends ActivityInstrumentationTestCase2 {
 	private Robot theRobot;
 	private Extractor theExtractor;
 	private Abstractor theAbstractor;
-	private StrategyPlanner theStrategyPlanner;
+	private Planner thePlanner;
 	private TraceDispatcher theScheduler;
 	private Strategy theStrategy;
 	private Persistence thePersistence;

@@ -2,7 +2,6 @@ package com.nofatclips.crawler.planning;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Random;
 
 import android.util.Log;
 
@@ -12,19 +11,20 @@ import com.nofatclips.androidtesting.model.WidgetState;
 import com.nofatclips.crawler.model.Abstractor;
 import com.nofatclips.crawler.model.EventHandler;
 import com.nofatclips.crawler.model.InputHandler;
+import com.nofatclips.crawler.planning.InputValuesOfWidget;
 
 import static com.nofatclips.crawler.Resources.*;
 import static com.nofatclips.androidtesting.model.InteractionType.*;
 import static com.nofatclips.androidtesting.model.SimpleType.*;
 
-public class SimpleUser implements EventHandler, InputHandler {
+public class AlternativeUser implements EventHandler, InputHandler {
 
-	public SimpleUser () {
+	public AlternativeUser () {
 		super();
-		this.randomGenerator = new Random();
+		this.ivw = new InputValuesOfWidget();
 	}
 	
-	public SimpleUser (Abstractor a) {
+	public AlternativeUser (Abstractor a) {
 		this();
 		setAbstractor(a);
 	}
@@ -49,7 +49,7 @@ public class SimpleUser implements EventHandler, InputHandler {
 		
 		// Return empty if don't know how to click
 		if (!useForClick(w)) return events;
-		if ( (w.getId().equals("-1"))  && (!eventWhenNoId () || (w.getName().equals("")) )) return events;
+		if ( (w.getId().equals("-1"))  && (!EVENT_WHEN_NO_ID || (w.getName().equals("")) )) return events;
 
 		// Plan a click on this widget
 		Log.d("nofatclips", "Handling event on widget id=" + w.getId() + " type=" + w.getSimpleType() + " name=" + w.getName());
@@ -58,26 +58,24 @@ public class SimpleUser implements EventHandler, InputHandler {
 		return events;
 	}
 	
-	public boolean eventWhenNoId () {
-		return EVENT_WHEN_NO_ID;
-	}
-	
 	@Override
-	public UserInput handleInput(WidgetState w) {
-		if (!useForInput(w)) return null;
+	public Collection<UserInput> handleInput(WidgetState w) {
+		ArrayList<UserInput> inputs=new ArrayList<UserInput>();
+		if (!useForInput(w)) return inputs;
 		Log.d("nofatclips", "Handling input on widget id=" + w.getId() + " type=" + w.getSimpleType());
 		if (w.getSimpleType().equals(CHECKBOX)) {
-//			if (randomGenerator.nextBoolean()) return null;
 			UserInput input = getAbstractor().createInput(w, "", CLICK);
-			return input;
-		} else if (w.getSimpleType().equals(RADIO)) {
-			return getAbstractor().createInput(w, "", CLICK);
-		} else if (w.getSimpleType().equals("editText")) {
-			int randomInt = randomGenerator.nextInt(this.upperLimit-this.lowerLimit) + this.lowerLimit;  
-			UserInput input = getAbstractor().createInput(w, String.valueOf(randomInt), TYPE_TEXT);
-			return input;
+			inputs.add(input);
+			return inputs;
+		} else if (w.getSimpleType().equals("editText")) {			  
+			String values[] = ivw.inputValueOfWidget(w);
+			for(int i=0;i<values.length;i++){
+				UserInput input = getAbstractor().createInput(w,values[i], TYPE_TEXT);
+				inputs.add(input);
+			}									
+			return inputs;
 		}
-		return null;
+		return inputs;
 	}
 
 	protected boolean useForClick (WidgetState w) {
@@ -103,22 +101,6 @@ public class SimpleUser implements EventHandler, InputHandler {
 		this.abs = abs;
 	}
 
-	public Random getRandomGenerator() {
-		return this.randomGenerator;
-	}
-
-	public void setRandomGenerator(Random randomGenerator) {
-		this.randomGenerator = randomGenerator;
-	}
-	
-	public void setLimits (int lower, int upper) {
-		this.lowerLimit = lower;
-		this.upperLimit = upper;
-	}
-	
+	private InputValuesOfWidget ivw;
 	private Abstractor abs;
-	private Random randomGenerator;
-	private int lowerLimit = 0;
-	private int upperLimit = 100;
-
 }

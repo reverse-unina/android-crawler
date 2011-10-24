@@ -12,7 +12,6 @@ import java.util.Map;
 import android.app.Activity;
 //import android.app.Instrumentation;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.TouchUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
@@ -159,10 +158,9 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 	
 	private void fireEventOnView (View v, String eventType, String value) {
 		if (eventType == CLICK) {
-			TouchUtils.clickView(test, v);
+			click (v);
 		} else if (eventType == BACK) {
 			solo.goBack();
-			home();
 		} else if (eventType == SCROLL_DOWN) {
 			solo.scrollDown();
 		} else if (eventType == SWAP_TAB && value!=null) {
@@ -181,6 +179,7 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 		extractState();
 	}
 
+	// Scroll the view to the top. Only works for ListView. Support for GridView and ScrollView must be added
 	public void home () {
 		final ArrayList<ListView> viewList = solo.getCurrentListViews();
 		if (viewList.size() > 0) {
@@ -205,7 +204,7 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 		if (inputType == TYPE_TEXT) {
 			solo.enterText((EditText)v, value);
 		} else if (inputType == CLICK) {
-			TouchUtils.clickView(test, v);
+			click (v);
 		}
 	}
 
@@ -239,7 +238,7 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 			}
 		});
 		this.test.getInstrumentation().waitForIdleSync();
-		if (num<l.getCount()/2) {
+		if (n<l.getCount()/2) {
 			solo.sendKey(Solo.DOWN);
 			solo.sendKey(Solo.UP);
 		} else {
@@ -248,10 +247,15 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 		}
 		this.test.getInstrumentation().waitForIdleSync();
 		View v = l.getSelectedView();
-		TouchUtils.clickView(test, v);
+		click (v);
 		if (v instanceof TextView) {
 			this.currentEvent.setDescription(((TextView)v).getText().toString());
 		}
+	}
+	
+	protected void click (View v) {
+//		TouchUtils.clickView(this.test, v);
+		solo.clickOnView(v);
 	}
 
 	public void clearWidgetList() {
@@ -260,6 +264,7 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 	}
 	
 	public void retrieveWidgets () {
+		home();
 		clearWidgetList();
 		Log.i("nofatclips", "Retrieving widgets");
 		for (View w: solo.getCurrentViews()) {

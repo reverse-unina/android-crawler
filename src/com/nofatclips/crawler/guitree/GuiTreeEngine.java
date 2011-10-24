@@ -12,11 +12,11 @@ import com.nofatclips.crawler.automation.SimpleTypeDetector;
 import com.nofatclips.crawler.filters.FormFilter;
 import com.nofatclips.crawler.filters.SimpleEventFilter;
 import com.nofatclips.crawler.model.Filter;
-import com.nofatclips.crawler.planning.SimplePlanner;
-import com.nofatclips.crawler.planning.SimpleStrategyPlanner;
-import com.nofatclips.crawler.planning.SimpleUser;
+import com.nofatclips.crawler.planning.AlternativePlanner;
+import com.nofatclips.crawler.planning.AlternativeUser;
 import com.nofatclips.crawler.planning.TraceDispatcher;
 import com.nofatclips.crawler.storage.DiskPersistence;
+import com.nofatclips.crawler.storage.StepDiskPersistence;
 import com.nofatclips.crawler.strategy.MaxStepsTermination;
 import com.nofatclips.crawler.strategy.SimpleStrategy;
 
@@ -48,7 +48,7 @@ public class GuiTreeEngine extends Engine {
 		setAbstractor(this.guiAbstractor);
 		setSession (this.theGuiTree);
 
-		SimplePlanner p = new SimplePlanner();
+		AlternativePlanner p = new AlternativePlanner();
 
 		Filter inputFilter = new FormFilter();
 		p.setInputFilter (inputFilter);
@@ -59,21 +59,19 @@ public class GuiTreeEngine extends Engine {
 		this.guiAbstractor.addFilter (eventFilter);
 		this.guiAbstractor.setTypeDetector(new SimpleTypeDetector());
 		
-		this.user = new SimpleUser(this.guiAbstractor);
+		this.user = new AlternativeUser(this.guiAbstractor);
 		p.setUser(user);
 		p.setFormFiller(user);
 		p.setAbstractor(this.guiAbstractor);
-		
-		SimpleStrategyPlanner sp=new SimpleStrategyPlanner();
-		sp.addPlanner(p);
-		setStrategyPlanner (sp);
+		setPlanner (p);
 		
 		setStrategy(new SimpleStrategy (COMPARATOR));
 		if (MAX_NUM_TRACES>0) {
 			getStrategy().addTerminationCriteria(new MaxStepsTermination(MAX_NUM_TRACES));
 		}
 		
-		d = new DiskPersistence (this.theGuiTree);
+		d = (stepPersistence())?new StepDiskPersistence (MAX_TRACES_IN_RAM):new DiskPersistence();
+		d.setSession(this.theGuiTree);
 		setPersistence (d);
 		
 	}
@@ -88,13 +86,19 @@ public class GuiTreeEngine extends Engine {
 		d.setContext(theAutomation.getActivity());
 		theRestarter.setRestartPoint(theAutomation.getActivity());
 		theGuiTree.setAppName(theAutomation.getAppName());
+		theGuiTree.setSleepAfterEvent(SLEEP_AFTER_EVENT);
+		theGuiTree.setSleepAfterRestart(SLEEP_AFTER_RESTART);
 		theGuiTree.setClassName(CLASS_NAME);
 		theGuiTree.setPackageName(PACKAGE_NAME);
 	}
 	
+	public boolean stepPersistence () {
+		return (MAX_TRACES_IN_RAM>0);
+	}
+	
 	private Automation theAutomation;
 	private GuiTreeAbstractor guiAbstractor;
-	private SimpleUser user;
+	private AlternativeUser user;
 	private BasicRestarter theRestarter;
 	private GuiTree theGuiTree;
 	private DiskPersistence d;

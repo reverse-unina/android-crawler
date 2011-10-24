@@ -2,9 +2,11 @@ package com.nofatclips.crawler.planning;
 
 import java.util.Collection;
 import java.util.HashSet;
-
+import java.util.ArrayList;
 import android.util.Log;
 
+import com.nofatclips.androidtesting.guitree.TestCaseEvent;
+import com.nofatclips.androidtesting.guitree.TestCaseInput;
 import com.nofatclips.androidtesting.model.*;
 import com.nofatclips.crawler.model.*;
 
@@ -12,7 +14,7 @@ import static com.nofatclips.crawler.Resources.*;
 import static com.nofatclips.androidtesting.model.InteractionType.*;
 import static com.nofatclips.androidtesting.model.SimpleType.*;
 
-public class SimplePlanner implements Planner {
+public class AlternativePlanner implements Planner {
 
 	public final static boolean ALLOW_SWAP_TAB = true;
 	public final static boolean NO_SWAP_TAB = false;
@@ -41,18 +43,37 @@ public class SimplePlanner implements Planner {
 			}
 			Collection<UserEvent> events = getUser().handleEvent(w);
 			for (UserEvent evt: events) {
-				if (evt == null) continue;
-				Collection<UserInput> inputs = new HashSet<UserInput>();
-				for (WidgetState formWidget: getInputFilter()) {
-					UserInput inp = getFormFiller().handleInput(formWidget);
-					if (inp != null) {
-						inputs.add(inp);
-					}
-				}
-				Transition t = getAbstractor().createStep(a, inputs, evt);
-				p.addTask(t);	
-			}
-		}
+				if (evt == null) continue;				
+				ArrayList[] mylists=new ArrayList[20];
+				int indice=0;
+				for(WidgetState formWidget: getInputFilter()){
+					if(getFormFiller().handleInput(formWidget).size()==0) continue;
+					mylists[indice]=new ArrayList<UserInput>();									
+					mylists[indice].addAll(getFormFiller().handleInput(formWidget));
+					indice++;
+				}	
+				if(indice==0) continue;					
+				Collection<UserInput> inputsbase=new ArrayList<UserInput>();				
+				for(int i=0;i<indice;i++){
+					inputsbase.add((UserInput)mylists[i].get(0));
+				}				
+				Transition t = getAbstractor().createStep(a, inputsbase, evt);
+				p.addTask(t);
+				ArrayList<UserInput> tempinputsbase=new ArrayList<UserInput>();
+				for(int i=0;i<indice;i++){									
+					for(int j=1;j<=mylists[i].size()-1;j++){
+						tempinputsbase.clear();
+						for(int l=0;l<indice;l++){
+							UserInput inp=(UserInput)mylists[l].get(0);
+							tempinputsbase.add(((TestCaseInput) inp).clone());
+						}					
+						tempinputsbase.set(i,(UserInput)mylists[i].get(j));
+						t = getAbstractor().createStep(a, tempinputsbase,((TestCaseEvent) evt).clone());					
+						p.addTask(t);				
+					}								
+				}				
+			}	
+		}		
 
 		UserEvent evt;
 		Transition t;
