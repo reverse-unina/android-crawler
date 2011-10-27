@@ -12,8 +12,11 @@ import com.nofatclips.crawler.automation.SimpleTypeDetector;
 import com.nofatclips.crawler.filters.FormFilter;
 import com.nofatclips.crawler.filters.SimpleEventFilter;
 import com.nofatclips.crawler.model.Filter;
-import com.nofatclips.crawler.planning.SimplePlanner;
-import com.nofatclips.crawler.planning.SimpleUser;
+//import com.nofatclips.crawler.planning.SimplePlanner;
+//import com.nofatclips.crawler.planning.SimpleUser;
+import com.nofatclips.crawler.planning.AlternativePlanner;
+import com.nofatclips.crawler.planning.AlternativeUser;
+
 import com.nofatclips.crawler.planning.TraceDispatcher;
 import com.nofatclips.crawler.storage.DiskPersistence;
 import com.nofatclips.crawler.storage.StepDiskPersistence;
@@ -47,7 +50,8 @@ public class GuiTreeEngine extends Engine {
 		setAbstractor(this.guiAbstractor);
 		setSession (this.theGuiTree);
 
-		SimplePlanner p = new SimplePlanner();
+		//SimplePlanner p = new SimplePlanner();
+		AlternativePlanner p = new AlternativePlanner();
 
 		Filter inputFilter = new FormFilter();
 		p.setInputFilter (inputFilter);
@@ -58,7 +62,8 @@ public class GuiTreeEngine extends Engine {
 		this.guiAbstractor.addFilter (eventFilter);
 		this.guiAbstractor.setTypeDetector(new SimpleTypeDetector());
 		
-		this.user = new SimpleUser(this.guiAbstractor);
+		//this.user = new SimpleUser(this.guiAbstractor);
+		this.user = new AlternativeUser(this.guiAbstractor);
 		p.setUser(user);
 		p.setFormFiller(user);
 		p.setAbstractor(this.guiAbstractor);
@@ -99,7 +104,8 @@ public class GuiTreeEngine extends Engine {
 	
 	private Automation theAutomation;
 	private GuiTreeAbstractor guiAbstractor;
-	private SimpleUser user;
+	//private SimpleUser user;
+	private AlternativeUser user;
 	private BasicRestarter theRestarter;
 	private GuiTree theGuiTree;
 	private DiskPersistence d;

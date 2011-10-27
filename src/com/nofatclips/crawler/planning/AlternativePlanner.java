@@ -86,6 +86,13 @@ public class AlternativePlanner implements Planner {
 			Log.i("nofatclips", "Created trace to press the back button");
 			p.addTask(t);
 		}
+		
+		if (MENU_EVENTS) {
+			evt = getAbstractor().createEvent(null, OPEN_MENU);
+			t = getAbstractor().createStep(a, new HashSet<UserInput>(), evt);
+			Log.i("nofatclips", "Created trace to press the menu button");
+			p.addTask(t);
+		}
 
 		// Special handling for tab switch
 		if ( (tabs!=null) && allowSwapTabs && (numberOfTabs>1) ) {

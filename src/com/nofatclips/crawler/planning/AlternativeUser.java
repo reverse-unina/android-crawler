@@ -39,35 +39,57 @@ public class AlternativeUser implements EventHandler, InputHandler {
 			int toItem = Math.min (fromItem + MAX_EVENTS_PER_WIDGET - 1, w.getCount());
 			
 			Log.d("nofatclips", "Handling events [" + fromItem + "," + toItem + "] on ListView id=" + w.getId() + " count=" + w.getCount() + " name=" + w.getName());
+			UserEvent event;
 			for (int i=fromItem; i<=toItem; i++) {
-				UserEvent event = getAbstractor().createEvent(w, LIST_SELECT);
+				event = getAbstractor().createEvent(w, LIST_SELECT);
 				event.setValue(String.valueOf(i));
 				events.add(event);
+				if (longClickEvent(true)) {
+					event = getAbstractor().createEvent(w, LIST_LONG_SELECT);
+					event.setValue(String.valueOf(i));
+					events.add(event);
+				}
 			}
 			return events;
 		}
 		
 		// Return empty if don't know how to click
 		if (!useForClick(w)) return events;
-		if ( (w.getId().equals("-1"))  && (!EVENT_WHEN_NO_ID || (w.getName().equals("")) )) return events;
+		if ( (w.getId().equals("-1"))  && (!eventWhenNoId () || (w.getName().equals("")) )) return events;
 
 		// Plan a click on this widget
 		Log.d("nofatclips", "Handling event on widget id=" + w.getId() + " type=" + w.getSimpleType() + " name=" + w.getName());
 		UserEvent event = getAbstractor().createEvent(w, CLICK);
 		events.add(event);
+		if (longClickEvent(false)) {
+			event = getAbstractor().createEvent(w, LONG_CLICK);
+			events.add(event);
+		}
 		return events;
 	}
+	
+	public boolean eventWhenNoId () {
+		return EVENT_WHEN_NO_ID;
+	}
+	
+	public boolean longClickEvent (boolean list) {
+		return (list)?LONG_CLICK_LIST_EVENT:LONG_CLICK_EVENT;
+	}	
 	
 	@Override
 	public Collection<UserInput> handleInput(WidgetState w) {
 		ArrayList<UserInput> inputs=new ArrayList<UserInput>();
 		if (!useForInput(w)) return inputs;
 		Log.d("nofatclips", "Handling input on widget id=" + w.getId() + " type=" + w.getSimpleType());
-		if (w.getSimpleType().equals(CHECKBOX)) {
+		if (w.getSimpleType().equals(CHECKBOX) && w.isClickable()) {
 			UserInput input = getAbstractor().createInput(w, "", CLICK);
 			inputs.add(input);
 			return inputs;
-		} else if (w.getSimpleType().equals("editText")) {			  
+		} else if (w.getSimpleType().equals(RADIO) && w.isClickable()) {
+			UserInput input = getAbstractor().createInput(w, "", CLICK);
+			inputs.add(input);
+			return inputs;
+		} else if (w.getSimpleType().equals("editText")) {	
 			String values[] = ivw.inputValueOfWidget(w);
 			for(int i=0;i<values.length;i++){
 				UserInput input = getAbstractor().createInput(w,values[i], TYPE_TEXT);
@@ -75,11 +97,12 @@ public class AlternativeUser implements EventHandler, InputHandler {
 			}									
 			return inputs;
 		}
-		return inputs;
+		return null;
 	}
-
+	
+	
 	protected boolean useForClick (WidgetState w) {
-		if (!w.isAvailable()) return false;
+		if (!(w.isAvailable() && w.isClickable())) return false;
 		return (w.getSimpleType().equals(BUTTON));
 	}
 
