@@ -50,7 +50,7 @@ public class SimplePlanner implements Planner {
 					}
 				}
 				Transition t = getAbstractor().createStep(a, inputs, evt);
-				p.addTask(t);	
+				p.addTask(t);
 			}
 		}
 
@@ -62,6 +62,13 @@ public class SimplePlanner implements Planner {
 			evt = getAbstractor().createEvent(null, BACK);
 			t = getAbstractor().createStep(a, new HashSet<UserInput>(), evt);
 			Log.i("nofatclips", "Created trace to press the back button");
+			p.addTask(t);
+		}
+		
+		if (MENU_EVENTS) {
+			evt = getAbstractor().createEvent(null, OPEN_MENU);
+			t = getAbstractor().createStep(a, new HashSet<UserInput>(), evt);
+			Log.i("nofatclips", "Created trace to press the menu button");
 			p.addTask(t);
 		}
 

@@ -12,13 +12,12 @@ import com.nofatclips.crawler.automation.SimpleTypeDetector;
 import com.nofatclips.crawler.filters.FormFilter;
 import com.nofatclips.crawler.filters.SimpleEventFilter;
 import com.nofatclips.crawler.model.Filter;
-import com.nofatclips.crawler.planning.AlternativePlanner;
-import com.nofatclips.crawler.planning.AlternativeUser;
+import com.nofatclips.crawler.planning.SimplePlanner;
+import com.nofatclips.crawler.planning.SimpleUser;
 import com.nofatclips.crawler.planning.TraceDispatcher;
 import com.nofatclips.crawler.storage.DiskPersistence;
 import com.nofatclips.crawler.storage.StepDiskPersistence;
-import com.nofatclips.crawler.strategy.MaxStepsTermination;
-import com.nofatclips.crawler.strategy.SimpleStrategy;
+import com.nofatclips.crawler.strategy.*;
 
 import static com.nofatclips.crawler.Resources.*;
 
@@ -48,7 +47,7 @@ public class GuiTreeEngine extends Engine {
 		setAbstractor(this.guiAbstractor);
 		setSession (this.theGuiTree);
 
-		AlternativePlanner p = new AlternativePlanner();
+		SimplePlanner p = new SimplePlanner();
 
 		Filter inputFilter = new FormFilter();
 		p.setInputFilter (inputFilter);
@@ -59,16 +58,18 @@ public class GuiTreeEngine extends Engine {
 		this.guiAbstractor.addFilter (eventFilter);
 		this.guiAbstractor.setTypeDetector(new SimpleTypeDetector());
 		
-		this.user = new AlternativeUser(this.guiAbstractor);
+		this.user = new SimpleUser(this.guiAbstractor);
 		p.setUser(user);
 		p.setFormFiller(user);
 		p.setAbstractor(this.guiAbstractor);
 		setPlanner (p);
 		
-		setStrategy(new SimpleStrategy (COMPARATOR));
-		if (MAX_NUM_TRACES>0) {
-			getStrategy().addTerminationCriteria(new MaxStepsTermination(MAX_NUM_TRACES));
-		}
+		StrategyFactory sf = new StrategyFactory(COMPARATOR, ADDITIONAL_CRITERIAS);
+		sf.setDepth(TRACE_MAX_DEPTH);
+		sf.setMaxTraces(MAX_NUM_TRACES);
+		sf.setMaxSeconds(MAX_TIME_CRAWLING);
+		sf.setCheckTransitions(CHECK_FOR_TRANSITION);
+		setStrategy (sf.getStrategy());
 		
 		d = (stepPersistence())?new StepDiskPersistence (MAX_TRACES_IN_RAM):new DiskPersistence();
 		d.setSession(this.theGuiTree);
@@ -98,7 +99,7 @@ public class GuiTreeEngine extends Engine {
 	
 	private Automation theAutomation;
 	private GuiTreeAbstractor guiAbstractor;
-	private AlternativeUser user;
+	private SimpleUser user;
 	private BasicRestarter theRestarter;
 	private GuiTree theGuiTree;
 	private DiskPersistence d;

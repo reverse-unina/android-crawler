@@ -43,8 +43,9 @@ public class AlternativePlanner implements Planner {
 			}
 			Collection<UserEvent> events = getUser().handleEvent(w);
 			for (UserEvent evt: events) {
-				if (evt == null) continue;				
-				ArrayList[] mylists=new ArrayList[20];
+				if (evt == null) continue;
+				int numWidgets=getInputFilter().numWidgets();
+				ArrayList[] mylists=new ArrayList[numWidgets];				
 				int indice=0;
 				for(WidgetState formWidget: getInputFilter()){
 					if(getFormFiller().handleInput(formWidget).size()==0) continue;

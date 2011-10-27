@@ -12,6 +12,7 @@ import com.nofatclips.androidtesting.model.WidgetState;
 public interface Abstractor {
 
 	public ActivityState createActivity (ActivityDescription desc);
+	public boolean updateDescription (ActivityState theActivity, ActivityDescription theDescription);
 	public void setBaseActivity (ActivityDescription desc);
 	public ActivityState getBaseActivity ();
 	

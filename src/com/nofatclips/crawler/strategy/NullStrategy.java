@@ -1,10 +1,9 @@
 package com.nofatclips.crawler.strategy;
 
 import com.nofatclips.androidtesting.model.ActivityState;
+import com.nofatclips.androidtesting.model.Trace;
 import com.nofatclips.crawler.model.Comparator;
 import com.nofatclips.crawler.model.Strategy;
-import com.nofatclips.crawler.model.TerminationCriteria;
-import com.nofatclips.crawler.model.TransitionCriteria;
 
 public class NullStrategy implements Strategy {
 
@@ -30,14 +29,36 @@ public class NullStrategy implements Strategy {
 	}
 
 	@Override
-	public void addTerminationCriteria(TerminationCriteria t) {}
-
-	@Override
-	public boolean checkForTransition(ActivityState theActivity) {
+	public boolean checkForTransition() {
 		return true;
 	}
 
 	@Override
-	public void addTransitionCriteria(TransitionCriteria theCriteria) {}
+	public void setTask(Trace theTask) {}
+
+	@Override
+	public boolean checkForExploration() {
+		return !isLastComparationPositive();
+	}
+
+	@Override
+	public boolean isLastComparationPositive() {
+		return false;
+	}
+
+	@Override
+	public Trace getTask() {
+		return null;
+	}
+
+	@Override
+	public ActivityState getStateBeforeEvent() {
+		return null;
+	}
+
+	@Override
+	public ActivityState getStateAfterEvent() {
+		return null;
+	}
 
 }

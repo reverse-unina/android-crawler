@@ -1,6 +1,7 @@
 package com.nofatclips.crawler.storage;
 
 import android.content.ContextWrapper;
+import android.util.Log;
 
 import com.nofatclips.androidtesting.model.Session;
 import com.nofatclips.androidtesting.model.Trace;
@@ -35,6 +36,7 @@ public class StepDiskPersistence extends DiskPersistence {
 	public void addTrace (Trace t) {
 		super.addTrace (t);
 		this.count++;
+		Log.i("nofatclips", "Session count is " + this.count +". Will dump to disk at " + this.step);
 		if (this.count == this.step) {
 			saveStep();
 			this.count=0;
@@ -73,8 +75,10 @@ public class StepDiskPersistence extends DiskPersistence {
 	}
 	
 	public void saveStep () {
-		if (!isFirst()) {
-			this.mode = ContextWrapper.MODE_APPEND;
+		if (isFirst()) {
+			Log.i ("nofatclips", "Saving the session on disk. This is the first batch: the file will be created.");					
+		} else {
+			Log.i ("nofatclips", "Saving the session on disk.");
 		}
 		save(isLast());
 		setNotFirst();
@@ -86,8 +90,12 @@ public class StepDiskPersistence extends DiskPersistence {
 	}
 	
 	public void save (boolean last) {
+		if (!isFirst()) {
+			this.mode = ContextWrapper.MODE_APPEND;
+		}
 		if (last) {
 			setLast();
+			Log.i ("nofatclips", "Saving the session on disk. This is the last batch. The session will be terminated.");			
 		}
 		super.save();
 		for (Trace t: getSession()) {

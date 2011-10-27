@@ -39,10 +39,16 @@ public class SimpleUser implements EventHandler, InputHandler {
 			int toItem = Math.min (fromItem + MAX_EVENTS_PER_WIDGET - 1, w.getCount());
 			
 			Log.d("nofatclips", "Handling events [" + fromItem + "," + toItem + "] on ListView id=" + w.getId() + " count=" + w.getCount() + " name=" + w.getName());
+			UserEvent event;
 			for (int i=fromItem; i<=toItem; i++) {
-				UserEvent event = getAbstractor().createEvent(w, LIST_SELECT);
+				event = getAbstractor().createEvent(w, LIST_SELECT);
 				event.setValue(String.valueOf(i));
 				events.add(event);
+				if (longClickEvent(true)) {
+					event = getAbstractor().createEvent(w, LIST_LONG_SELECT);
+					event.setValue(String.valueOf(i));
+					events.add(event);
+				}
 			}
 			return events;
 		}
@@ -55,6 +61,10 @@ public class SimpleUser implements EventHandler, InputHandler {
 		Log.d("nofatclips", "Handling event on widget id=" + w.getId() + " type=" + w.getSimpleType() + " name=" + w.getName());
 		UserEvent event = getAbstractor().createEvent(w, CLICK);
 		events.add(event);
+		if (longClickEvent(false)) {
+			event = getAbstractor().createEvent(w, LONG_CLICK);
+			events.add(event);
+		}
 		return events;
 	}
 	
@@ -62,15 +72,19 @@ public class SimpleUser implements EventHandler, InputHandler {
 		return EVENT_WHEN_NO_ID;
 	}
 	
+	public boolean longClickEvent (boolean list) {
+		return (list)?LONG_CLICK_LIST_EVENT:LONG_CLICK_EVENT;
+	}
+	
 	@Override
 	public UserInput handleInput(WidgetState w) {
 		if (!useForInput(w)) return null;
 		Log.d("nofatclips", "Handling input on widget id=" + w.getId() + " type=" + w.getSimpleType());
-		if (w.getSimpleType().equals(CHECKBOX)) {
+		if (w.getSimpleType().equals(CHECKBOX) && w.isClickable()) {
 //			if (randomGenerator.nextBoolean()) return null;
 			UserInput input = getAbstractor().createInput(w, "", CLICK);
 			return input;
-		} else if (w.getSimpleType().equals(RADIO)) {
+		} else if (w.getSimpleType().equals(RADIO) && w.isClickable()) {
 			return getAbstractor().createInput(w, "", CLICK);
 		} else if (w.getSimpleType().equals("editText")) {
 			int randomInt = randomGenerator.nextInt(this.upperLimit-this.lowerLimit) + this.lowerLimit;  
@@ -81,7 +95,7 @@ public class SimpleUser implements EventHandler, InputHandler {
 	}
 
 	protected boolean useForClick (WidgetState w) {
-		if (!w.isAvailable()) return false;
+		if (!(w.isAvailable() && w.isClickable())) return false;
 		return (w.getSimpleType().equals(BUTTON));
 	}
 

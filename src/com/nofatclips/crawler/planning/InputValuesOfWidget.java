@@ -25,11 +25,11 @@ public class InputValuesOfWidget implements InputType{
 		}
 		
 		//TYPE_NUMBER_MASK = hex(0x00000002)  int(2)
-		int TYPE_NUMBER_MASK=(TYPE_CLASS_NUMBER|TYPE_NUMBER_FLAG_DECIMAL);
+		int TYPE_NUMBER_MASK=(TYPE_CLASS_NUMBER);
 		if((TYPE_NUMBER_MASK & type)==TYPE_NUMBER_MASK){
 			valuesList=new String[3];
 			valuesList[0]="5";
-			valuesList[1]="-5";
+			valuesList[1]="15";
 			valuesList[2]="0";
 			return valuesList;
 		}

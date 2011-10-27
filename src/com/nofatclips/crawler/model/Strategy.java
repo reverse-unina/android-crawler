@@ -1,6 +1,7 @@
 package com.nofatclips.crawler.model;
 
 import com.nofatclips.androidtesting.model.ActivityState;
+import com.nofatclips.androidtesting.model.Trace;
 
 // Strategy takes three decisions:
 // 1) detecting whether a transition occurred (store it!) or not (discard it!) after the injection of an event
@@ -11,14 +12,20 @@ public interface Strategy {
 	
 	public void addState (ActivityState newActivity);
 	
-	public boolean compareState (ActivityState theActivity);
 	public Comparator getComparator ();
 	public void setComparator (Comparator c);
 
-	public boolean checkForTransition (ActivityState theActivity);
-	public void addTransitionCriteria (TransitionCriteria theCriteria);
+	public boolean compareState (ActivityState theActivity);
+	public boolean isLastComparationPositive ();
 
+	public boolean checkForTransition ();
 	public boolean checkForTermination (ActivityState theActivity);
-	public void addTerminationCriteria (TerminationCriteria theCriteria);
+	public boolean checkForExploration ();
+
+	public void setTask(Trace theTask);
+	public Trace getTask();
+	
+	public ActivityState getStateBeforeEvent();
+	public ActivityState getStateAfterEvent ();
 	
 }
