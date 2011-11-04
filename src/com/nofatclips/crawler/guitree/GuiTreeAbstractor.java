@@ -65,6 +65,7 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler {
 	public ActivityState createActivity (ActivityDescription desc, boolean start) {
 		ActivityState newActivity = (start)?StartActivity.createActivity(getTheSession()):FinalActivity.createActivity(getTheSession());
 		newActivity.setName(desc.getActivityName());
+		newActivity.setTitle(desc.getActivityTitle());
 		newActivity.setId(getUniqueActivityId());
 		for (Filter f: this.filters) {
 			f.clear();

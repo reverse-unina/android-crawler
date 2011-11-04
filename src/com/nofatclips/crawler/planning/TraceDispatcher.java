@@ -75,7 +75,7 @@ public class TraceDispatcher implements Iterable<Trace> {
 		
 		@Override
 		public Trace nextTask() {
-			Log.d("nofatclips", "Dispatching new task. " + tasks.size() + " more tasks remaining.");
+			Log.i("nofatclips", "Dispatching new task. " + tasks.size() + " more tasks remaining.");
 			return (hasMore())?tasks.get(0):null;
 		}
 

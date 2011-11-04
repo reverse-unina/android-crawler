@@ -8,6 +8,6 @@
 	<classpathentry kind="lib" path="/Android Test/src/com/nofatclips/androidtesting/model" sourcepath="/Android Test/src/com/nofatclips/androidtesting/model"/>
 	<classpathentry kind="lib" path="/Android Test/src/com/nofatclips/androidtesting/xml" sourcepath="/Android Test/src/com/nofatclips/androidtesting/xml"/>
 	<classpathentry kind="lib" path="C:/Francesco/Specialistica/Tirocinio/ProgettoAndroid/Crawler/robotium-solo-2.3.jar"/>
-	<classpathentry kind="src" path="/Android Test"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Android Test"/>
+	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

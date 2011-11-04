@@ -21,7 +21,7 @@ public class SimplePlanner implements Planner {
 	
 	@Override
 	public Plan getPlanForActivity (ActivityState a) {
-		return getPlanForActivity(a, NO_SWAP_TAB, ALLOW_GO_BACK);
+		return getPlanForActivity(a, !TAB_EVENTS_START_ONLY, ALLOW_GO_BACK);
 	}
 
 	@Override

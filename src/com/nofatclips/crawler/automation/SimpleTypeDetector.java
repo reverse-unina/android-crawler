@@ -20,6 +20,8 @@ public class SimpleTypeDetector implements TypeDetector {
 			return RADIO;
 		if (type.endsWith("CheckBox") || type.endsWith("CheckedTextView"))
 			return CHECKBOX;
+		if (type.endsWith("IconMenuView"))
+			return MENU_VIEW;
 		if (type.endsWith("IconMenuItemView"))
 			return BUTTON;
 		if (type.endsWith("Button"))
@@ -28,10 +30,12 @@ public class SimpleTypeDetector implements TypeDetector {
 			return EDIT_TEXT;
 		if (type.endsWith("TabHost"))
 			return TAB_HOST;
-		if (type.endsWith("ListView"))
+		if (type.endsWith("ListView") || type.endsWith("ExpandedMenuView"))
 			return LIST_VIEW;
 		if (type.endsWith("TextView"))
 			return TEXT_VIEW;
+		if (type.endsWith("ImageView"))
+			return IMAGE_VIEW;
 		return "";
 	}
 

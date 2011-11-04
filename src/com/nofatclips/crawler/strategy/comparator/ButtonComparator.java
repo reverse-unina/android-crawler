@@ -5,9 +5,8 @@ import static com.nofatclips.androidtesting.model.SimpleType.*;
 
 public class ButtonComparator extends CustomWidgetsComparator {
 
-        public ButtonComparator () {
-                super (BUTTON);
-        }
+	public ButtonComparator () {
+		super (BUTTON);
+	}
 
 }
-

@@ -5,9 +5,9 @@ import com.nofatclips.crawler.model.Comparator;
 
 public class NullComparator implements Comparator {
 
-        @Override
-        public boolean compare(ActivityState a, ActivityState b) {
-                return false;
-        }
+	@Override
+	public boolean compare(ActivityState a, ActivityState b) {
+		return false;
+	}
 
 }

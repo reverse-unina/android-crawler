@@ -104,13 +104,13 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 				v = getAllWidgets().get(e.getWidget().getIndex()); // Search widget by index
 			}
 			if ((v!=null) && checkWidgetEquivalence(v, Integer.parseInt(e.getWidgetId()), e.getWidgetType(), e.getWidgetName())) { // Widget found
-				Log.d("nofatclips", "Firing event: type= " + eventType + " index=" + e.getWidget().getIndex() + " widget="+ e.getWidgetType());
+				Log.i("nofatclips", "Firing event: type= " + eventType + " index=" + e.getWidget().getIndex() + " widget="+ e.getWidgetType());
 				fireEventOnView (v, eventType, e.getValue());
 			} else if (e.getWidgetId().equals("-1")) { // Widget not found. Search widget by name
-				Log.d("nofatclips", "Firing event: type= " + eventType + " name=" + e.getWidgetName() + " widget="+ e.getWidgetType());
+				Log.i("nofatclips", "Firing event: type= " + eventType + " name=" + e.getWidgetName() + " widget="+ e.getWidgetType());
 				fireEvent (e.getWidgetName(), e.getWidget().getSimpleType(), eventType, e.getValue());			
 			} else { // Widget not found. Search widget by id
-				Log.d("nofatclips", "Firing event: type= " + eventType + " id=" + e.getWidgetId() + " widget="+ e.getWidgetType());
+				Log.i("nofatclips", "Firing event: type= " + eventType + " id=" + e.getWidgetId() + " widget="+ e.getWidgetType());
 				fireEvent (Integer.parseInt(e.getWidgetId()), e.getWidgetName(), e.getWidget().getSimpleType(), eventType, e.getValue());
 			}
 		}
@@ -231,6 +231,7 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 			}
 		});
 		this.test.getInstrumentation().waitForIdleSync();
+		describeCurrentEvent(t.getTabWidget().getChildAt(n));
 	}
 
 	private void selectListItem (ListView l, String item) {
@@ -282,6 +283,8 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 		if (v instanceof TextView) {
 			this.currentEvent.setDescription(((TextView)v).getText().toString());
 			return true;
+		} else if (v instanceof TabHost) {
+			this.currentEvent.setDescription(((TabHost)v).getCurrentTabTag());
 		} else if (v instanceof ViewGroup) {
 			int childNum = ((ViewGroup)v).getChildCount();
 			for (int i = 0; i<childNum; i++) {
@@ -374,9 +377,9 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 	public boolean checkWidgetEquivalence (View testee, int theId, String theType, String theName) {
 		Log.i("nofatclips", "Retrieved from return list id=" + testee.getId());
 		String testeeType = testee.getClass().getName();
-		Log.i("nofatclips", "Testing for type (" + testeeType + ") against the original (" + theType + ")");
+		Log.d("nofatclips", "Testing for type (" + testeeType + ") against the original (" + theType + ")");
 		String testeeName = (testee instanceof TextView)?((TextView) testee).getText().toString():"";
-		Log.i("nofatclips", "Testing for name (" + testeeName + ") against the original (" + theName + ")");
+		Log.d("nofatclips", "Testing for name (" + testeeName + ") against the original (" + theName + ")");
 		if ( (theType.equals(testeeType)) && (theName.equals(testeeName)) && (theId == testee.getId()) ) {
 			return true;
 		}
@@ -387,7 +390,7 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 		ArrayList<View> theList = new ArrayList<View>();
 		for (View theView: getAllWidgets()) {
 			if (theView.getId() == id) {
-				Log.i("nofatclips", "Added to return list id=" + id);
+				Log.d("nofatclips", "Added to return list id=" + id);
 				theList.add(theView);
 			}
 		}
@@ -439,7 +442,12 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 //					return getActivity().getLocalClassName();
 					return getActivity().getClass().getSimpleName();
 				}
-				
+
+				@Override
+				public String getActivityTitle() {
+					return getActivity().getTitle().toString();
+				}
+
 				@Override
 				public String toString() {
 					return getActivityName();
