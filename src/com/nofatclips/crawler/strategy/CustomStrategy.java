@@ -6,6 +6,7 @@ import java.util.Collection;
 import com.nofatclips.crawler.model.Comparator;
 import com.nofatclips.crawler.model.StrategyCriteria;
 import com.nofatclips.crawler.strategy.criteria.ExplorationCriteria;
+import com.nofatclips.crawler.strategy.criteria.PauseCriteria;
 import com.nofatclips.crawler.strategy.criteria.TerminationCriteria;
 import com.nofatclips.crawler.strategy.criteria.TransitionCriteria;
 
@@ -34,6 +35,8 @@ public class CustomStrategy extends SimpleStrategy {
 			addTransitionCriteria((TransitionCriteria)criteria);
 		} else if (criteria instanceof TerminationCriteria) {
 			addTerminationCriteria((TerminationCriteria)criteria);
+		} else if (criteria instanceof PauseCriteria) {
+			addPauseCriteria((PauseCriteria)criteria);
 		}
 	}
 	

@@ -1,14 +1,13 @@
 package com.nofatclips.crawler.model;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
-
+import java.util.List;
 import com.nofatclips.androidtesting.model.Transition;
 
 public class Plan implements Iterable<Transition> {
 
-	private Set<Transition> tasks = new HashSet<Transition> ();
+	private List<Transition> tasks = new ArrayList<Transition> ();
 
 	@Override
 	public Iterator<Transition> iterator() {

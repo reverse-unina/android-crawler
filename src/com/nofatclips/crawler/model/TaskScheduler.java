@@ -18,5 +18,6 @@ public interface TaskScheduler {
 	public boolean hasMore();
 	public void remove (Trace t);
 	public void addTasks(Trace t);
+	public List<Trace> getTaskList();
 
 }

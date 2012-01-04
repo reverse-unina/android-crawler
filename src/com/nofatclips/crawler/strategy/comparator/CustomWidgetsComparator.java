@@ -39,7 +39,7 @@ public class CustomWidgetsComparator extends NameComparator {
 	}
 	
 	protected boolean matchWidget (WidgetState campo, WidgetState altroCampo) {
-		return altroCampo.getId().equals(campo.getId());
+		return ( (altroCampo.getId().equals(campo.getId())) && (altroCampo.getSimpleType().equals(campo.getSimpleType())));
 	}
 
 	@Override
@@ -57,14 +57,6 @@ public class CustomWidgetsComparator extends NameComparator {
 			
 			if (matchClass(campo.getSimpleType()) && (id>0) ) {
 				Log.v("nofatclips","Comparing " + type + " #" + id);
-//				boolean trovato = false;
-//				for (WidgetState altroCampo: stored) {
-//					if (matchWidget (altroCampo, campo)) {
-//						trovato = true;
-//						break;
-//					}
-//				}
-//				if (!trovato) return false;
 				if (!lookFor(campo, storedActivity)) return false;
 				checkedAlready.add(campo.getId()); // store widgets checked in this step to skip them in the next step
 			}
@@ -79,14 +71,6 @@ public class CustomWidgetsComparator extends NameComparator {
 			
 			if ( matchClass(campo.getSimpleType()) && (id>0) && (!checkedAlready.contains(campo.getId())) ) {
 				Log.v("nofatclips","Comparing " + type + " #" + id);
-//				boolean trovato = false;
-//				for (WidgetState altroCampo: current) {
-//					if (matchWidget(altroCampo, campo)) {
-//						trovato = true;
-//						break;
-//					}
-//				}
-//				if (!trovato) return false;
 				if (!lookFor(campo, currentActivity)) return false;
 			}
 		}

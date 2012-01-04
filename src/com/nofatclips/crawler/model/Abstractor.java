@@ -2,6 +2,8 @@ package com.nofatclips.crawler.model;
 
 import java.util.Collection;
 
+import org.w3c.dom.Element;
+
 import com.nofatclips.androidtesting.model.ActivityState;
 import com.nofatclips.androidtesting.model.Trace;
 import com.nofatclips.androidtesting.model.Transition;
@@ -20,5 +22,7 @@ public interface Abstractor {
 	public UserInput createInput (WidgetState target, String value, String type);
 	public Trace createTrace (Trace prototype, Transition appendix);
 	public Transition createStep (ActivityState start, Collection<UserInput> inputs, UserEvent event);
+	public Trace importTask(Element e);
+	public ActivityState importState (Element fromXml);
 	
 }

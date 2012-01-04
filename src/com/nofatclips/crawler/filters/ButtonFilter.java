@@ -1,6 +1,5 @@
 package com.nofatclips.crawler.filters;
 
-
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;

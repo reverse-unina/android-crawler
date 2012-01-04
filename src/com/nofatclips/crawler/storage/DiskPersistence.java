@@ -1,9 +1,6 @@
 package com.nofatclips.crawler.storage;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-
+import java.io.*;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
@@ -14,6 +11,7 @@ import com.nofatclips.androidtesting.model.Session;
 import com.nofatclips.androidtesting.model.Trace;
 import com.nofatclips.androidtesting.xml.XmlGraph;
 import com.nofatclips.crawler.model.Persistence;
+import com.nofatclips.crawler.model.SaveStateListener;
 
 public class DiskPersistence implements Persistence {
 	
@@ -25,12 +23,10 @@ public class DiskPersistence implements Persistence {
 		setSession(theSession);
 	}
 
-	@Override
 	public void setFileName(String name) {
 		this.fileName = name;
 	}
 
-	@Override
 	public void setSession(Session s) {
 		this.theSession = s;
 	}
@@ -47,12 +43,10 @@ public class DiskPersistence implements Persistence {
 		this.w = new ContextWrapper(a);
 	}
 
-	@Override
 	public void addTrace(Trace t) {
 		this.theSession.addTrace(t);
 	}
 
-	@Override
 	public void save() {
 		save (this.fileName);
 	}
@@ -94,9 +88,13 @@ public class DiskPersistence implements Persistence {
 	}
 	
 	public void writeOnFile (String graph) throws IOException {
-		this.osw.write(graph);
+		writeOnFile (this.osw, graph);
 	}
-	
+
+	public void writeOnFile (OutputStreamWriter output, String graph) throws IOException {
+		output.write(graph);
+	}
+
 	public void openFile (String fileName) {
 		try{
 			this.fOut = w.openFileOutput(fileName, this.mode);
@@ -106,21 +104,73 @@ public class DiskPersistence implements Persistence {
 			e.printStackTrace();
 		}
 	}
+
+	public boolean delete (String fileName) {
+		return w.deleteFile(fileName);
+	}
 	
-	public void closeFile () {
+	public boolean exists (String filename) {
+		File file = w.getFileStreamPath(filename);
+		return file.exists();
+	}
+
+	public void copy (String from, String to) {
+		FileInputStream in;
+		FileOutputStream out;
+		byte[] buffer = new byte[4096];
+		
 		try {
-			this.osw.flush();
+			in = w.openFileInput(from);
+			out = w.openFileOutput(to, ContextWrapper.MODE_PRIVATE);
+			int n = 0;
+			
+			while ((n = in.read(buffer)) != -1) {
+				out.write(buffer, 0, n);
+			}
+
+			in.close();
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void closeFile () {
+		closeFile (this.fOut, this.osw);
+	}
+	
+	public void closeFile (FileOutputStream theFile, OutputStreamWriter theStream) {
+		try {
+			theStream.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				this.osw.close();
-				this.fOut.close();
+				theStream.close();
+				theFile.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
+	
+	public void closeFile (OutputStream theFile, OutputStream theStream) {
+		try {
+			theStream.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				theStream.close();
+				theFile.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void registerListener(SaveStateListener listener) { /* do nothing */ }
 
 	FileOutputStream fOut = null; 
     OutputStreamWriter osw = null;

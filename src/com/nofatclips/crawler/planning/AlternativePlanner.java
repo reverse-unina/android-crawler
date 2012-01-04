@@ -1,18 +1,35 @@
 package com.nofatclips.crawler.planning;
 
+import static com.nofatclips.androidtesting.model.InteractionType.BACK;
+import static com.nofatclips.androidtesting.model.InteractionType.OPEN_MENU;
+import static com.nofatclips.androidtesting.model.InteractionType.SCROLL_DOWN;
+import static com.nofatclips.crawler.Resources.BACK_BUTTON_EVENT;
+import static com.nofatclips.crawler.Resources.MENU_EVENTS;
+import static com.nofatclips.crawler.Resources.SCROLL_DOWN_EVENT;
+import static com.nofatclips.crawler.Resources.TAB_EVENTS_START_ONLY;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import android.util.Log;
 
 import com.nofatclips.androidtesting.guitree.TestCaseEvent;
 import com.nofatclips.androidtesting.guitree.TestCaseInput;
-import com.nofatclips.androidtesting.model.*;
-import com.nofatclips.crawler.model.*;
-
-import static com.nofatclips.crawler.Resources.*;
-import static com.nofatclips.androidtesting.model.InteractionType.*;
-import static com.nofatclips.androidtesting.model.SimpleType.*;
+import com.nofatclips.androidtesting.model.ActivityState;
+import com.nofatclips.androidtesting.model.Transition;
+import com.nofatclips.androidtesting.model.UserEvent;
+import com.nofatclips.androidtesting.model.UserInput;
+import com.nofatclips.androidtesting.model.WidgetState;
+import com.nofatclips.crawler.model.Abstractor;
+import com.nofatclips.crawler.model.EventHandler;
+import com.nofatclips.crawler.model.Filter;
+import com.nofatclips.crawler.model.InputHandler;
+import com.nofatclips.crawler.model.Plan;
+import com.nofatclips.crawler.model.Planner;
+import com.nofatclips.crawler.model.UserAdapter;
 
 public class AlternativePlanner implements Planner {
 
@@ -23,7 +40,7 @@ public class AlternativePlanner implements Planner {
 	
 	@Override
 	public Plan getPlanForActivity (ActivityState a) {
-		return getPlanForActivity(a, NO_SWAP_TAB, ALLOW_GO_BACK);
+		return getPlanForActivity(a, !TAB_EVENTS_START_ONLY, ALLOW_GO_BACK);
 	}
 
 	@Override
@@ -34,51 +51,86 @@ public class AlternativePlanner implements Planner {
 	public Plan getPlanForActivity (ActivityState a, boolean allowSwapTabs, boolean allowGoBack) {
 		Plan p = new Plan();
 		Log.i("nofatclips", "Planning for new Activity " + a.getName());
-		WidgetState tabs = null;
-		int numberOfTabs = 0;
+		boolean semaphore=true;
+		List<UserInput>[] mylists=null;
+		int supNumWidgets=0;
+		int numWidgets=0;
 		for (WidgetState w: getEventFilter()) {
-			if (w.getSimpleType().equals(TAB_HOST)) {
-				tabs = w;
-				numberOfTabs = w.getCount();
-			}
 			Collection<UserEvent> events = getUser().handleEvent(w);
 			for (UserEvent evt: events) {
-				if (evt == null) continue;
-				int numWidgets=getInputFilter().numWidgets();
-				ArrayList[] mylists=new ArrayList[numWidgets];				
-				int indice=0;
-				for(WidgetState formWidget: getInputFilter()){
-					if(getFormFiller().handleInput(formWidget).size()==0) continue;
-					mylists[indice]=new ArrayList<UserInput>();									
-					mylists[indice].addAll(getFormFiller().handleInput(formWidget));
-					indice++;
-				}	
-				if(indice==0) continue;					
-				Collection<UserInput> inputsbase=new ArrayList<UserInput>();				
-				for(int i=0;i<indice;i++){
-					inputsbase.add((UserInput)mylists[i].get(0));
+				if (evt == null) continue;				
+				//Il semaforo è indispensabile per creare una sola volta la
+				//lista di valori di input per ciascun widget con il metodo
+				//handleInput.
+				//Cosa ben più importante è che i valori random generati devono 
+				//restare uguali per i diversi task eseguibili sull'activity
+				//Infatti potrebbero esserci più eventi nell' activity in
+				//questione ed è importante che i tasks vengano costruiti con
+				//combinazioni di input derivate da liste che in corrispondenza
+				//di valori random restino le stesse
+				if(semaphore){
+					//Calculating upper limit on the number of widgets
+					supNumWidgets=0;
+					Iterator<WidgetState> it=a.iterator();
+					while(it.hasNext()){
+						it.next();
+						supNumWidgets++;
+					}
+					
+					//Loading of the input lists for each widget
+					mylists=new List[supNumWidgets];				
+					numWidgets=0;
+					for(WidgetState formWidget: getInputFilter()){
+						List<UserInput> list=getFormFiller().handleInput(formWidget);
+						if(list.size()!=0){						
+							mylists[numWidgets]=list;
+							numWidgets++;
+						}						
+					}
+					semaphore=false;
+				}
+				else {
+					//Cloning of the input list for each widget
+					for(int i=0;i<numWidgets;i++){
+						for(int k=0;k<mylists[i].size();k++){
+							mylists[i].set(k,((TestCaseInput)mylists[i].get(k)).clone());
+						}
+					}
+				}
+				
+				//Creation of first combination
+				Collection<UserInput> inputsbase=new ArrayList<UserInput>();
+				for(int i=0;i<numWidgets;i++){
+						inputsbase.add(mylists[i].get(0));
 				}				
-				Transition t = getAbstractor().createStep(a, inputsbase, evt);
+				Transition t = getAbstractor().createStep(a, inputsbase, evt);				
 				p.addTask(t);
-				ArrayList<UserInput> tempinputsbase=new ArrayList<UserInput>();
-				for(int i=0;i<indice;i++){									
+				Log.i("castigliafrancesco", "Create trace for activity" + a.getName()+" First Combination of "+numWidgets+" input widgets");
+
+				//Creation of the other combinations
+				Collection<UserInput> tempinputsbase=new ArrayList<UserInput>();
+				for(int i=0;i<numWidgets;i++){									
 					for(int j=1;j<=mylists[i].size()-1;j++){
 						tempinputsbase.clear();
-						for(int l=0;l<indice;l++){
-							UserInput inp=(UserInput)mylists[l].get(0);
+						for(int l=0;l<numWidgets;l++){
+							if(l==i){
+								UserInput inp=mylists[i].get(j);
+								tempinputsbase.add(inp);
+								continue;
+							}
+							UserInput inp=mylists[l].get(0);
 							tempinputsbase.add(((TestCaseInput) inp).clone());
-						}					
-						tempinputsbase.set(i,(UserInput)mylists[i].get(j));
+						}	
+						Log.i("castigliafrancesco", "Create trace for activity" + a.getName()+" Alternative Combination of input windgets");
 						t = getAbstractor().createStep(a, tempinputsbase,((TestCaseEvent) evt).clone());					
 						p.addTask(t);				
 					}								
-				}				
-			}	
-		}		
-
+				}					
+			}
+		}						
 		UserEvent evt;
-		Transition t;
-		
+        Transition t;
+
 		// Special handling for pressing back button
 		if (BACK_BUTTON_EVENT && allowGoBack) {
 			evt = getAbstractor().createEvent(null, BACK);
@@ -92,19 +144,6 @@ public class AlternativePlanner implements Planner {
 			t = getAbstractor().createStep(a, new HashSet<UserInput>(), evt);
 			Log.i("nofatclips", "Created trace to press the menu button");
 			p.addTask(t);
-		}
-
-		// Special handling for tab switch
-		if ( (tabs!=null) && allowSwapTabs && (numberOfTabs>1) ) {
-			int tabNum = 2;
-			do {
-				evt = getAbstractor().createEvent(tabs, SWAP_TAB);
-				evt.setValue(String.valueOf(tabNum));
-				t = getAbstractor().createStep(a, new HashSet<UserInput>(), evt);
-				Log.i("nofatclips", "Created trace to explore tab #" + tabNum);
-				p.addTask(t);
-				tabNum++;
-			} while (tabNum<=numberOfTabs);
 		}
 
 		// Special handling for scrolling down

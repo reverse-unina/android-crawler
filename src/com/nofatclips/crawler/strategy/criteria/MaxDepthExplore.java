@@ -24,12 +24,10 @@ public class MaxDepthExplore implements ExplorationCriteria {
 		return this.maxDepth;
 	}
 
-	@Override
 	public void setStrategy(Strategy theStrategy) {
 		this.theStrategy = theStrategy;
 	}
 
-	@Override
 	@SuppressWarnings("unused")
 	public boolean exploration() {
 		int transitions = 0;

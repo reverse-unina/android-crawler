@@ -1,16 +1,21 @@
 package com.nofatclips.crawler.guitree;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.DOMException;
+import org.w3c.dom.Element;
 
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Checkable;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.AdapterView;
 import android.widget.AbsSpinner;
@@ -19,8 +24,9 @@ import android.widget.TabHost;
 import com.nofatclips.androidtesting.guitree.*;
 import com.nofatclips.androidtesting.model.*;
 import com.nofatclips.crawler.model.*;
+import com.nofatclips.crawler.storage.PersistenceFactory;
 
-public class GuiTreeAbstractor implements Abstractor, FilterHandler {
+public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateListener {
 
 	private GuiTree theSession;
 	private StartActivity baseActivity;
@@ -29,6 +35,11 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler {
 	private int inputId=0;
 	private int activityId=0;
 	private TypeDetector detector;
+	private List<AbstractorListener> theListeners = new ArrayList<AbstractorListener>();
+	public final static String ACTOR_NAME = "GuiTreeAbstractor";
+	private static final String EVENT_PARAM_NAME = "eventId";
+	private static final String INPUT_PARAM_NAME = "inputId";
+	private static final String ACTIVITY_PARAM_NAME = "activityId";
 
 	public GuiTreeAbstractor () throws ParserConfigurationException {
 		this (new GuiTree());
@@ -38,6 +49,7 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler {
 		super();
 		this.filters = new HashSet<Filter>();
 		setTheSession(s);
+		PersistenceFactory.registerForSavingState(this);
 	}
 
 	public GuiTree getTheSession() {
@@ -56,7 +68,6 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler {
 		this.detector = t;
 	}
 
-	@Override
 	public ActivityState createActivity (ActivityDescription desc) {
 		return createActivity (desc,false);
 	}
@@ -72,10 +83,12 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler {
 		}
 		boolean hasDescription = updateDescription(newActivity, desc, false);
 		if (!hasDescription) newActivity.setId("exit");
+		for (AbstractorListener listener: this.theListeners) {
+			listener.onNewActivity(newActivity);
+		}
 		return newActivity;
 	}
 
-	@Override
 	public boolean updateDescription (ActivityState newActivity, ActivityDescription desc) {
 		return updateDescription  (newActivity, desc, true);
 	}
@@ -88,19 +101,22 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler {
 			TestCaseWidget w = TestCaseWidget.createWidget(getTheSession());
 			String id = String.valueOf(v.getId());
 			String text = "";
+			int type = 0;
 			if (v instanceof TextView) {
 				TextView t = (TextView)v;
-				int type = t.getInputType();
-				if (type!=0) {
-					w.setTextType("" + type);
-				}
+				type = t.getInputType();
 				text = t.getText().toString();
 			}
 			w.setIdNameType(id, text, v.getClass().getName());
+			if (type!=0) {
+				w.setTextType("" + type);
+			}
 			w.setSimpleType(getTypeDetector().getSimpleType(v));
 			setCount (v,w);
+			setValue (v,w);
 			w.setAvailable((v.isEnabled())?"true":"false");
 			w.setClickable((v.isClickable())?"true":"false");
+			w.setLongClickable((v.isLongClickable())?"true":"false");
 			w.setIndex(desc.getWidgetIndex(v));
 			if (detectDuplicates && newActivity.hasWidget(w)) continue;
 			newActivity.addWidget(w);
@@ -113,21 +129,57 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler {
 	
 	@SuppressWarnings("rawtypes")
 	private void setCount (View v, WidgetState w) {
+		// For lists, the count is set to the number of rows in the list (inactive rows count as well)
 		if (v instanceof AdapterView) {
 			w.setCount(((AdapterView)v).getCount());
 			return;
 		}
+		
+		// For Spinners, the count is set to the number of options
 		if (v instanceof AbsSpinner) {
 			w.setCount(((AbsSpinner)v).getCount());
 			return;
 		}
+		
+		// For the tab layout host, the count is set to the number of tabs
 		if (v instanceof TabHost) {
 			w.setCount(((TabHost)v).getTabWidget().getTabCount());
 			return;
 		}
+		
+		// For grids, the count is set to the number of icons
 		if (v instanceof ViewGroup) {
 			w.setCount(((ViewGroup)v).getChildCount());
+			return;
 		}
+		
+		// For progress bars, seek bars and rating bars, the count is set to the maximum value allowed
+		if (v instanceof ProgressBar) {
+			w.setCount(((ProgressBar)v).getMax());
+			return;
+		}
+		
+	}
+	
+	private void setValue (View v, WidgetState w) {
+		
+		// Checkboxes, radio buttons and toggle buttons -> the value is the checked state (true or false)
+		if (v instanceof Checkable) {
+			w.setValue(String.valueOf(((Checkable) v).isChecked()));
+		}
+
+		// Textview, Editview et al. -> the value is the displayed text
+		if (v instanceof TextView) {
+			w.setValue(((TextView) v).getText().toString());
+//			Log.e("nofatclips", "Hint for " + (((TextView) v).getText().toString()) + " = " + (((TextView) v).getHint()));
+			return;
+		}
+		
+		// Progress bars, seek bars and rating bars -> the value is the current progress
+		if (v instanceof ProgressBar) {
+			w.setValue(String.valueOf(((ProgressBar) v).getProgress()));
+		}
+				
 	}
 	
 	public void setBaseActivity (ActivityDescription desc) {
@@ -138,17 +190,14 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler {
 		return this.baseActivity;
 	}
 
-	@Override
 	public Iterator<Filter> iterator() {
 		return this.filters.iterator();
 	}
 
-	@Override
 	public void addFilter(Filter f) {
 		this.filters.add(f);
 	}
 
-	@Override
 	public UserEvent createEvent(WidgetState target, String type) {
 		TestCaseEvent newEvent = TestCaseEvent.createEvent(getTheSession());
 		if (target == null) {
@@ -162,20 +211,24 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler {
 		}
 		newEvent.setType(type);
 		newEvent.setId(getUniqueEventId());
+		for (AbstractorListener listener: this.theListeners) {
+			listener.onNewEvent(newEvent);
+		}
 		return newEvent;
 	}
 
-	@Override
 	public UserInput createInput(WidgetState target, String text, String type) {
 		TestCaseInput newInput = TestCaseInput.createInput(getTheSession());
 		newInput.setWidget(target);
 		newInput.setValue(text);
 		newInput.setType(type);
 		newInput.setId(getUniqueInputId());
+		for (AbstractorListener listener: this.theListeners) {
+			listener.onNewInput(newInput);
+		}
 		return newInput;
 	}
 
-	@Override
 	public Trace createTrace(Trace head, Transition tail) {
 		TestCaseTrace t;
 		if (head!= null) {
@@ -187,6 +240,20 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler {
 		return t;
 	}
 	
+	public Trace importTask (Element fromXml) {
+		TestCaseTrace imported = new TestCaseTrace (getTheSession());
+		Element task = (Element)getTheSession().getDom().adoptNode(fromXml);
+		imported.setElement(task);
+		return imported;
+	}
+
+	public ActivityState importState (Element fromXml) {
+		Element state = (Element)getTheSession().getDom().adoptNode(fromXml);
+		ActivityState imported = (state.getNodeName().equals(FinalActivity.getTag()))?FinalActivity.createActivity(getTheSession()):StartActivity.createActivity(getTheSession());
+		imported.setElement(state);
+		return imported;
+	}
+
 	public Transition createStep (ActivityState start, Collection<UserInput> inputs, UserEvent event) {
 		Transition t = TestCaseTransition.createTransition(start.getElement().getOwnerDocument());
 		try {
@@ -202,6 +269,10 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler {
 		return t;
 	}
 	
+	public void registerListener(AbstractorListener theListener) {
+		this.theListeners.add(theListener);
+	}
+	
 	public String getUniqueEventId () {
 		this.eventId++;
 		return "e" + this.eventId;
@@ -215,6 +286,25 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler {
 	public String getUniqueInputId () {
 		this.inputId++;
 		return "i" + this.inputId;
+	}
+
+	public SessionParams onSavingState() {
+		SessionParams state = new SessionParams();
+		state.store(EVENT_PARAM_NAME, String.valueOf(this.eventId));
+		state.store(INPUT_PARAM_NAME, String.valueOf(this.inputId));
+		state.store(ACTIVITY_PARAM_NAME, String.valueOf(this.activityId));
+		return state;
+	}
+	
+	public void onLoadingState(SessionParams sessionParams) {
+		this.eventId = sessionParams.getInt(EVENT_PARAM_NAME);
+		this.inputId = sessionParams.getInt(INPUT_PARAM_NAME);
+		this.activityId = sessionParams.getInt(ACTIVITY_PARAM_NAME);
+		Log.d("nofatclips", "Restored abstractor counters to: event = " + eventId + " - input = " + inputId + " - activity = " + activityId);
+	}
+
+	public String getListenerName() {
+		return ACTOR_NAME;
 	}
 
 }

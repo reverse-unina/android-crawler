@@ -5,17 +5,21 @@ import android.util.Log;
 
 import com.nofatclips.androidtesting.model.Session;
 import com.nofatclips.androidtesting.model.Trace;
+import com.nofatclips.crawler.model.SaveStateListener;
+import com.nofatclips.crawler.model.SessionParams;
 
 import static com.nofatclips.crawler.Resources.*;
 
-public class StepDiskPersistence extends DiskPersistence {
+public class StepDiskPersistence extends DiskPersistence implements SaveStateListener {
 
 	public StepDiskPersistence () {
 		super();
+		PersistenceFactory.registerForSavingState(this);
 	}
 	
 	public StepDiskPersistence (Session theSession) {
 		super(theSession);
+		PersistenceFactory.registerForSavingState(this);
 	}
 
 	public StepDiskPersistence (int theStep) {
@@ -49,6 +53,7 @@ public class StepDiskPersistence extends DiskPersistence {
 		
 		// Session is smaller than the step: fall back to DiskPersistence behavior and save all
 		if (isFirst() && isLast()) {
+//			Log.e("nofatclips","Session is smaller than the step: fall back to DiskPersistence behavior and save all");
 			return graph;
 		}
 		
@@ -57,20 +62,24 @@ public class StepDiskPersistence extends DiskPersistence {
 		
 		// First step: return header and body, save the footer for the final step
 		if (isFirst()) {
+//			Log.e("nofatclips","First step: return header and body, save the footer for the final step");
 			this.footer = graph.substring(bodyEnd);
 			return graph.substring(0,bodyEnd);
 		}
 		
 		// Final step: return the body (if any) and the footer
 		if (isLast()) {
+//			Log.e("nofatclips","Final step: return the body (if any) and the footer");
 			return (bodyBegin == -1)?(this.footer):graph.substring(bodyBegin);
 		}
 		
 		if ( (bodyBegin == -1) || (bodyEnd == -1) ) { // Empty body
+//			Log.e("nofatclips","Empty body");
 			return "";
 		}
 		
 		// Return the body of the XML graph
+//		Log.e("nofatclips","Return the body of the XML graph");
 		return graph.substring(bodyBegin,bodyEnd);
 	}
 	
@@ -118,11 +127,30 @@ public class StepDiskPersistence extends DiskPersistence {
 	public void setLast () {
 		this.last = true;
 	}
-	
+
+	@Override
+	public String getListenerName() {
+		return ACTOR_NAME;
+	}
+
+	@Override
+	public SessionParams onSavingState() {
+		return new SessionParams(PARAM_NAME, this.footer);
+	}
+
+	@Override
+	public void onLoadingState(SessionParams sessionParams) {
+		this.footer = sessionParams.get(PARAM_NAME);
+		Log.d("nofatclips", "Backup session footer restored to " + this.footer);
+	}
+
 	private int step = 1;
 	private int count = 0;
 	private String footer = "";
 	private boolean first = true;
 	private boolean last = false;
+	
+	public final static String ACTOR_NAME = "StepDiskPersistence";
+	public final static String PARAM_NAME = "footer";
 
 }

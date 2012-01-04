@@ -19,8 +19,9 @@ public interface Strategy {
 	public boolean isLastComparationPositive ();
 
 	public boolean checkForTransition ();
-	public boolean checkForTermination (ActivityState theActivity);
+	public boolean checkForTermination ();
 	public boolean checkForExploration ();
+	public boolean checkForPause ();
 
 	public void setTask(Trace theTask);
 	public Trace getTask();
@@ -28,4 +29,6 @@ public interface Strategy {
 	public ActivityState getStateBeforeEvent();
 	public ActivityState getStateAfterEvent ();
 	
+	public void registerTerminationListener(TerminationListener theListener);
+
 }

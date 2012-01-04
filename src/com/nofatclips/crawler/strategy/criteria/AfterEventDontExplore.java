@@ -13,12 +13,10 @@ public class AfterEventDontExplore implements ExplorationCriteria {
 		this.forbiddenDescriptions = forbiddenDescriptions;
 	}
 	
-	@Override
 	public void setStrategy(Strategy theStrategy) {
 		this.theStrategy = theStrategy;	
 	}
 
-	@Override
 	public boolean exploration() {
 		return (checkDescription() && checkWidgetName()); 
 	}

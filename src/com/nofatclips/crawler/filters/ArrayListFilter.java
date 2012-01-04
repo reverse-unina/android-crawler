@@ -38,11 +38,6 @@ public abstract class ArrayListFilter implements Filter {
 		this.filteredItems.clear();
 	}
 	
-	@Override
-	public int numWidgets () {
-		return this.filteredItems.size();
-	}	
-
 	private ArrayList<WidgetState> filteredItems = new ArrayList<WidgetState>();
 
 }
