@@ -239,9 +239,6 @@ public class Resources {
 	
 	// Strategy Parameters
 	public final static int MAX_NUM_TRACES = 0; // After performing this amount of traces, the crawler exits (0 = no length limit)
-	public final static int MAX_NUM_COMBINATIONS = 4;// It's only used when MAX_NUM_TRACES == 0 												  									
-	//MAX_NUM_COMBINATIONS = 0: Planner generates all adiacent combinations
-	//MAX_NUM_COMBINATIONS = k: Planner generates k combinations taken equally spaced
 	public final static int PAUSE_AFTER_TRACES = 0; // After performing this amount of traces, the crawler pauses (0 = no pause)
 	public final static long MAX_TIME_CRAWLING = 0; // In seconds (0 = no time limit)
 	public final static long PAUSE_AFTER_TIME = 0; // In seconds (0 = no pause)
@@ -259,8 +256,13 @@ public class Resources {
 //	public final static String FILE_NAME = "guitree.xml"; // Output
 	
 	// User/Planner Parameters
-	public final static int MAX_EVENTS_PER_WIDGET = 12; // For GroupViews (0 = try all items in the group)
+	public final static int MAX_EVENTS_PER_WIDGET = 2; // For GroupViews (0 = try all items in the group)
 	public final static int MAX_TASKS_PER_EVENT = 0; // How many input sequences to generate for each event on a widget; 0 = no limit
+	public final static int PLANNER = 2;// It's only used when MAX_NUM_TRACES == 0 												  									
+	//PLANNER = 1: CombinationPlanner generates all combinations of the input widgets
+	//PLANNER = 2: AdiacentPlanner generates all adiacent combinations of the input widgets
+	//PLANNER = 3: MinimalCoverageOfValuePlanner generates minimum number of combinations to assure total coverage of input values (of widgets)
+	//PLANNER = incorrect value: MinimalCoverageOfValuePlanner as default planner
 	public final static boolean EVENT_WHEN_NO_ID = false; // Whether to inject events on widgets without ID or not
 	public final static boolean BACK_BUTTON_EVENT = true;
 	public final static boolean MENU_EVENTS = true;

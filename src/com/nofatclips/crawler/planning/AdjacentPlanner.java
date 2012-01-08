@@ -31,7 +31,7 @@ import com.nofatclips.crawler.model.Plan;
 import com.nofatclips.crawler.model.Planner;
 import com.nofatclips.crawler.model.UserAdapter;
 
-public class CombinationsPlanner implements Planner {
+public class AdjacentPlanner implements Planner {
 
 	public final static boolean ALLOW_SWAP_TAB = true;
 	public final static boolean NO_SWAP_TAB = false;
@@ -53,13 +53,11 @@ public class CombinationsPlanner implements Planner {
 		Log.i("castigliafrancesco", "Planning for new Activity " + a.getName());
 		boolean semaphore=true;
 		List<UserInput>[] mylists=null;
-		int indexes[][]=null;
-		List[] mask=null;
 		int supNumWidgets=0;
 		int numWidgets=0;
 		for (WidgetState w: getEventFilter()) {
 			Collection<UserEvent> events = getUser().handleEvent(w);
-			for (UserEvent evt: events) {				
+			for (UserEvent evt: events) {
 				if (evt == null) continue;				
 				//Il semaforo è indispensabile per creare una sola volta la
 				//lista di valori di input per ciascun widget con il metodo
@@ -80,7 +78,7 @@ public class CombinationsPlanner implements Planner {
 					}
 					
 					//Loading of the input lists for each widget
-					mylists=new List[supNumWidgets];					
+					mylists=new List[supNumWidgets];				
 					numWidgets=0;
 					for(WidgetState formWidget: getInputFilter()){
 						List<UserInput> list=getFormFiller().handleInput(formWidget);
@@ -89,70 +87,45 @@ public class CombinationsPlanner implements Planner {
 							numWidgets++;
 						}						
 					}
-										
-					//Calculation of the mylits sizes
-					int [] sizesOfmylists = new int[numWidgets];				
-					for(int i=0;i<numWidgets;i++){
-						sizesOfmylists[i]=mylists[i].size();
-					}				
-					indexes=calculateIndexesOfCombinations(sizesOfmylists);				
-					
-					//Calculation of the index mask
-					mask=new List[numWidgets];
-					for(int  i=0;i<numWidgets;i++){
-						mask[i]=new ArrayList();
-						for(int  j=0;j<sizesOfmylists[i];j++){
-							mask[i].add(1);
-						}						
-					}
-					
-					for(int i=0;i<indexes.length;i++){
-						String s=new String();
-						for(int k=0;k<numWidgets;k++){
-							s = s.concat(Integer.toString((indexes[i][k])));
-						}
-						Log.i("castigliafrancesco", s);
-					}				
-					
 					semaphore=false;
 				}
-				
-				//Questo ciclo crea tutte le combinazioni di input possibili
-				//facendo attenzione ad usare tutti gli inputs contenuti in
-				//mylists ed a clonare gli stessi dopo che sono stati
-				//usati in qualche combinazione precedente.
-				//Infatti è importante associare almeno tutti gli input di
-				//mylists a qualche transizione con createStep altrimenti
-				//restano nell'xml senza elemento padre "transition" e quindi
-				//manderebbero in crisi il crawler che eseguire solo le 
-				//iterazioni di input senza il successivo evento.
-				//A tal scopo marchiamo con -1 l'elemento input già adoperato
-				//servendosi della maschera di indici corrispondente
-				Collection<UserInput> inputsbase=new ArrayList<UserInput>();
-				for(int i=0;i<indexes.length;i++){
-					inputsbase.clear();
-					for(int k=0;k<numWidgets;k++){													
-						UserInput inp=mylists[k].get(indexes[i][k]);
-						if((mask[k].get(indexes[i][k])).equals(-1)){
-							//Occorre clonarlo perchè già usato
-							inputsbase.add(((TestCaseInput) inp).clone());
+				else {
+					//Cloning of the input list for each widget
+					for(int i=0;i<numWidgets;i++){
+						for(int k=0;k<mylists[i].size();k++){
+							mylists[i].set(k,((TestCaseInput)mylists[i].get(k)).clone());
 						}
-						else{							
-							//Non occorre clonarlo perchè non è stato usato
-							inputsbase.add(inp);//Viene usato
-							mask[k].set(indexes[i][k],-1);  //Viene marcato come già usato
-						}	
 					}
-					Transition t;
-					if(i==0){						
-						t = getAbstractor().createStep(a, inputsbase, evt);
-					}
-					else{
-						t = getAbstractor().createStep(a, inputsbase, ((TestCaseEvent) evt).clone());
-					}					
-					p.addTask(t);							
-					Log.i("castigliafrancesco", "CombinationsPlanner: Create trace for activity" + a.getName()+" Combination of "+numWidgets+" input widgets");
 				}
+				
+				//Creation of first combination
+				Collection<UserInput> inputsbase=new ArrayList<UserInput>();
+				for(int i=0;i<numWidgets;i++){
+						inputsbase.add(mylists[i].get(0));
+				}				
+				Transition t = getAbstractor().createStep(a, inputsbase, evt);				
+				p.addTask(t);
+				Log.i("castigliafrancesco", "AdiacentPlanner: Create trace for activity" + a.getName()+" Combination of "+numWidgets+" input widgets");
+
+				//Creation of the other combinations
+				Collection<UserInput> tempinputsbase=new ArrayList<UserInput>();
+				for(int i=0;i<numWidgets;i++){									
+					for(int j=1;j<=mylists[i].size()-1;j++){
+						tempinputsbase.clear();
+						for(int l=0;l<numWidgets;l++){
+							if(l==i){
+								UserInput inp=mylists[i].get(j);
+								tempinputsbase.add(inp);
+								continue;
+							}
+							UserInput inp=mylists[l].get(0);
+							tempinputsbase.add(((TestCaseInput) inp).clone());
+						}	
+						Log.i("castigliafrancesco", "AdiacentPlanner: Create trace for activity" + a.getName()+" Combination of "+numWidgets+" input widgets");
+						t = getAbstractor().createStep(a, tempinputsbase,((TestCaseEvent) evt).clone());					
+						p.addTask(t);				
+					}								
+				}					
 			}
 		}						
 		UserEvent evt;
@@ -183,41 +156,6 @@ public class CombinationsPlanner implements Planner {
 
 		return p;
 	}
-	
-	private int[][] calculateIndexesOfCombinations(int[] sizesOfmylists) {
-
-		int numWidgets=sizesOfmylists.length;
-		int numComb=1;
-		for(int i=0;i<numWidgets;i++){
-			numComb=numComb*sizesOfmylists[i];
-		}
-		int indexes[][]=new int[numComb][numWidgets];		
-		int passo=numComb;
-		int relativeRow=0;			
-		int valueOfIndex=0;
-		for(int j=0;j<numWidgets;j++){
-			passo=passo/sizesOfmylists[j];
-			relativeRow=0;
-			valueOfIndex=0;
-			for(int i=0;i<numComb;i++){
-				if(relativeRow==passo){
-					relativeRow=0;
-					valueOfIndex=valueOfIndex+1;
-					if(valueOfIndex==sizesOfmylists[j])
-						valueOfIndex=0;
-				}
-				indexes[i][j]=valueOfIndex;
-				relativeRow++;
-			}			
-		}		
-//		for(int i=0;i<numComb;i++){
-//			for(int k=0;k<numWidgtes;k++){
-//				System.out.print(indexes[i][k]);
-//			}
-//			System.out.println();
-//		}
-		return indexes;
-	}	
 	
 	public Filter getEventFilter() {
 		return this.eventFilter;

@@ -31,7 +31,7 @@ import com.nofatclips.crawler.model.Plan;
 import com.nofatclips.crawler.model.Planner;
 import com.nofatclips.crawler.model.UserAdapter;
 
-public class AlternativePlanner implements Planner {
+public class MinimalCoverageOfValuesPlanner implements Planner {
 
 	public final static boolean ALLOW_SWAP_TAB = true;
 	public final static boolean NO_SWAP_TAB = false;
@@ -50,14 +50,16 @@ public class AlternativePlanner implements Planner {
 
 	public Plan getPlanForActivity (ActivityState a, boolean allowSwapTabs, boolean allowGoBack) {
 		Plan p = new Plan();
-		Log.i("nofatclips", "Planning for new Activity " + a.getName());
+		Log.i("castigliafrancesco", "Planning for new Activity " + a.getName());
 		boolean semaphore=true;
 		List<UserInput>[] mylists=null;
+		int indexes[][]=null;
+		List[] mask=null;
 		int supNumWidgets=0;
 		int numWidgets=0;
 		for (WidgetState w: getEventFilter()) {
 			Collection<UserEvent> events = getUser().handleEvent(w);
-			for (UserEvent evt: events) {
+			for (UserEvent evt: events) {				
 				if (evt == null) continue;				
 				//Il semaforo è indispensabile per creare una sola volta la
 				//lista di valori di input per ciascun widget con il metodo
@@ -78,7 +80,7 @@ public class AlternativePlanner implements Planner {
 					}
 					
 					//Loading of the input lists for each widget
-					mylists=new List[supNumWidgets];				
+					mylists=new List[supNumWidgets];					
 					numWidgets=0;
 					for(WidgetState formWidget: getInputFilter()){
 						List<UserInput> list=getFormFiller().handleInput(formWidget);
@@ -87,45 +89,71 @@ public class AlternativePlanner implements Planner {
 							numWidgets++;
 						}						
 					}
+										
+					//Calculation of the mylits sizes
+					int [] sizesOfmylists = new int[numWidgets];				
+					for(int i=0;i<numWidgets;i++){
+						sizesOfmylists[i]=mylists[i].size();
+					}				
+					indexes=calculateIndexesOfCombinations(sizesOfmylists);				
+					
+					//Calculation of the index mask
+					mask=new List[numWidgets];
+					for(int  i=0;i<numWidgets;i++){
+						mask[i]=new ArrayList();
+						for(int  j=0;j<sizesOfmylists[i];j++){
+							mask[i].add(1);
+						}						
+					}
+					
+					for(int i=0;i<indexes.length;i++){
+						String s=new String();
+						for(int k=0;k<numWidgets;k++){
+							s = s.concat(Integer.toString((indexes[i][k])));
+						}
+						Log.i("castigliafrancesco", s);
+					}				
+					
 					semaphore=false;
 				}
-				else {
-					//Cloning of the input list for each widget
-					for(int i=0;i<numWidgets;i++){
-						for(int k=0;k<mylists[i].size();k++){
-							mylists[i].set(k,((TestCaseInput)mylists[i].get(k)).clone());
-						}
-					}
-				}
 				
-				//Creation of first combination
+				//Questo ciclo crea le combinazioni sufficienti a garantire 
+				//almeno una volta la copertura di ciascun valore di input
+				//facendo attenzione ad usare tutti gli inputs contenuti in
+				//mylists ed a clonare gli stessi dopo che sono stati
+				//usati in qualche combinazione precedente.
+				//Infatti è importante associare almeno tutti gli input di
+				//mylists a qualche transizione con createStep altrimenti
+				//restano nell'xml senza elemento padre "transition" e quindi
+				//manderebbero in crisi il crawler che eseguire solo le 
+				//iterazioni di input senza il successivo evento.
+				//A tal scopo marchiamo con -1 l'elemento input già adoperato
+				//servendosi della maschera di indici corrispondente
 				Collection<UserInput> inputsbase=new ArrayList<UserInput>();
-				for(int i=0;i<numWidgets;i++){
-						inputsbase.add(mylists[i].get(0));
-				}				
-				Transition t = getAbstractor().createStep(a, inputsbase, evt);				
-				p.addTask(t);
-				Log.i("castigliafrancesco", "Create trace for activity" + a.getName()+" First Combination of "+numWidgets+" input widgets");
-
-				//Creation of the other combinations
-				Collection<UserInput> tempinputsbase=new ArrayList<UserInput>();
-				for(int i=0;i<numWidgets;i++){									
-					for(int j=1;j<=mylists[i].size()-1;j++){
-						tempinputsbase.clear();
-						for(int l=0;l<numWidgets;l++){
-							if(l==i){
-								UserInput inp=mylists[i].get(j);
-								tempinputsbase.add(inp);
-								continue;
-							}
-							UserInput inp=mylists[l].get(0);
-							tempinputsbase.add(((TestCaseInput) inp).clone());
+				for(int i=0;i<indexes.length;i++){
+					inputsbase.clear();
+					for(int k=0;k<numWidgets;k++){													
+						UserInput inp=mylists[k].get(indexes[i][k]);
+						if(mask[k].get(indexes[i][k]).equals(-1)){
+							//Occorre clonarlo perchè già usato
+							inputsbase.add(((TestCaseInput) inp).clone());
+						}
+						else{							
+							//Non occorre clonarlo perchè non è stato usato
+							inputsbase.add(inp);//Viene usato
+							mask[k].set(indexes[i][k],-1);  //Viene marcato come già usato
 						}	
-						Log.i("castigliafrancesco", "Create trace for activity" + a.getName()+" Alternative Combination of input windgets");
-						t = getAbstractor().createStep(a, tempinputsbase,((TestCaseEvent) evt).clone());					
-						p.addTask(t);				
-					}								
-				}					
+					}
+					Transition t;
+					if(i==0){						
+						t = getAbstractor().createStep(a, inputsbase, evt);
+					}
+					else{
+						t = getAbstractor().createStep(a, inputsbase, ((TestCaseEvent) evt).clone());
+					}					
+					p.addTask(t);							
+					Log.i("castigliafrancesco", "MinimalCoverageOfValuesPlanner: Create trace for activity" + a.getName()+" Combination of "+numWidgets+" input widgets");
+				}
 			}
 		}						
 		UserEvent evt;
@@ -135,14 +163,14 @@ public class AlternativePlanner implements Planner {
 		if (BACK_BUTTON_EVENT && allowGoBack) {
 			evt = getAbstractor().createEvent(null, BACK);
 			t = getAbstractor().createStep(a, new HashSet<UserInput>(), evt);
-			Log.i("nofatclips", "Created trace to press the back button");
+			Log.i("castigliafrancesco", "Created trace to press the back button");
 			p.addTask(t);
 		}
 		
 		if (MENU_EVENTS) {
 			evt = getAbstractor().createEvent(null, OPEN_MENU);
 			t = getAbstractor().createStep(a, new HashSet<UserInput>(), evt);
-			Log.i("nofatclips", "Created trace to press the menu button");
+			Log.i("castigliafrancesco", "Created trace to press the menu button");
 			p.addTask(t);
 		}
 
@@ -150,12 +178,33 @@ public class AlternativePlanner implements Planner {
 		if (SCROLL_DOWN_EVENT) {
 			evt = getAbstractor().createEvent(null, SCROLL_DOWN);
 			t = getAbstractor().createStep(a, new HashSet<UserInput>(), evt);
-			Log.i("nofatclips", "Created trace to perform scrolling down");
+			Log.i("castigliafrancesco", "Created trace to perform scrolling down");
 			p.addTask(t);
 		}
 
 		return p;
 	}
+	
+	private int[][] calculateIndexesOfCombinations(int[] sizesOfmylists) {
+		int numWidgets=sizesOfmylists.length;		
+		int numComb=1;
+		for(int i=0;i<numWidgets;i++){			
+			if(sizesOfmylists[i]>numComb)
+				numComb=sizesOfmylists[i];
+		}
+		int indexes[][]=new int[numComb][numWidgets];
+		for(int i=0;i<numComb;i++){
+			for(int j=0;j<numWidgets;j++){
+				indexes[i][j]=0;
+			}
+		}
+		for(int j=0;j<numWidgets;j++){
+			for(int i=0;i<sizesOfmylists[j];i++){
+					indexes[i][j]=i;
+			}										
+		}
+		return indexes;
+	}	
 	
 	public Filter getEventFilter() {
 		return this.eventFilter;

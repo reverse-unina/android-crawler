@@ -16,8 +16,9 @@ import com.nofatclips.crawler.filters.SpinnerAndFormFilter;
 import com.nofatclips.crawler.model.Filter;
 import com.nofatclips.crawler.model.Planner;
 import com.nofatclips.crawler.model.UserAdapter;
-import com.nofatclips.crawler.planning.AlternativePlanner;
+import com.nofatclips.crawler.planning.AdjacentPlanner;
 import com.nofatclips.crawler.planning.CombinationsPlanner;
+import com.nofatclips.crawler.planning.MinimalCoverageOfValuesPlanner;
 import com.nofatclips.crawler.planning.SimplePlanner;
 import com.nofatclips.crawler.planning.TraceDispatcher;
 import com.nofatclips.crawler.planning.UserFactory;
@@ -53,7 +54,7 @@ public class GuiTreeEngine extends Engine {
 		setSession (this.theGuiTree);
 
 		Planner p = (MAX_TASKS_PER_EVENT == 0 )?
-				((MAX_NUM_COMBINATIONS == 0 )?new AlternativePlanner():new CombinationsPlanner()):
+				((PLANNER == 1 )?new CombinationsPlanner():((PLANNER == 2 )?new AdjacentPlanner():new MinimalCoverageOfValuesPlanner())):
 				new SimplePlanner();
 		Filter inputFilter = (MAX_TASKS_PER_EVENT == 0)?new SpinnerAndFormFilter():new FormFilter();
 		
