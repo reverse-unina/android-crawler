@@ -77,12 +77,12 @@ public class Resources {
 //	//	new FixedValueEditor().addIdValuePair(2131165215, "").addIdValuePair(2131165217, ""),
 //	//};
 	
-	public final static String PACKAGE_NAME = "PackageAndroid.Android";
-	public final static String CLASS_NAME = "PackageAndroid.Android.ProvaAndroidActivity";
-	public final static String FILE_NAME = "prova.xml"; // Output
-	public final static Comparator COMPARATOR = new CustomWidgetsDeepCountListComparator(CustomWidgetsComparator.IGNORE_ACTIVITY_NAME, BUTTON, LIST_VIEW, MENU_VIEW, IMAGE_VIEW);
-	public final static int SLEEP_AFTER_EVENT = 4000;
-	public final static int SLEEP_AFTER_RESTART = 4000;
+//	public final static String PACKAGE_NAME = "PackageAndroid.Android";
+//	public final static String CLASS_NAME = "PackageAndroid.Android.ProvaAndroidActivity";
+//	public final static String FILE_NAME = "prova.xml"; // Output
+//	public final static Comparator COMPARATOR = new CustomWidgetsDeepCountListComparator(CustomWidgetsComparator.IGNORE_ACTIVITY_NAME, BUTTON, LIST_VIEW, MENU_VIEW, IMAGE_VIEW);
+//	public final static int SLEEP_AFTER_EVENT = 4000;
+//	public final static int SLEEP_AFTER_RESTART = 4000;
 
 //	public final static String PACKAGE_NAME = "com.porfirio.orariprocida2011";
 //	public final static String CLASS_NAME = "com.porfirio.orariprocida2011.OrariProcida2011Activity";
@@ -91,15 +91,15 @@ public class Resources {
 //	public final static int SLEEP_AFTER_EVENT = 4000;
 //	public final static int SLEEP_AFTER_RESTART = 4000;	
 	
-//	public final static String PACKAGE_NAME = "ee.smkv.calc.loan";
-//	public final static String CLASS_NAME = "ee.smkv.calc.loan.MainActivity";
-//	public final static String FILE_NAME = "simpleLoanCalculator.xml";
-//	public final static Comparator COMPARATOR = new CustomWidgetsDeepCountListComparator(CustomWidgetsComparator.IGNORE_ACTIVITY_NAME, BUTTON, LIST_VIEW, MENU_VIEW, IMAGE_VIEW);
-//	public final static int SLEEP_AFTER_EVENT = 6000;
-//	public final static int SLEEP_AFTER_RESTART = 2000;
-//	static {
-//		UserFactory.addEvent(CLICK, BUTTON, TEXT_VIEW);
-//	}
+	public final static String PACKAGE_NAME = "ee.smkv.calc.loan";
+	public final static String CLASS_NAME = "ee.smkv.calc.loan.MainActivity";
+	public final static String FILE_NAME = "simpleLoanCalculator.xml";
+	public final static Comparator COMPARATOR = new CustomWidgetsDeepCountListComparator(CustomWidgetsComparator.IGNORE_ACTIVITY_NAME, BUTTON, LIST_VIEW, MENU_VIEW, IMAGE_VIEW);
+	public final static int SLEEP_AFTER_EVENT = 6000;
+	public final static int SLEEP_AFTER_RESTART = 2000;
+	static {
+		UserFactory.addEvent(CLICK, BUTTON, TEXT_VIEW);
+	}
 	
 
 //	public final static String PACKAGE_NAME = "com.bwx.bequick";
@@ -256,9 +256,9 @@ public class Resources {
 //	public final static String FILE_NAME = "guitree.xml"; // Output
 	
 	// User/Planner Parameters
-	public final static int MAX_EVENTS_PER_WIDGET = 2; // For GroupViews (0 = try all items in the group)
+	public final static int MAX_EVENTS_PER_WIDGET = 12; // For GroupViews (0 = try all items in the group)
 	public final static int MAX_TASKS_PER_EVENT = 0; // How many input sequences to generate for each event on a widget; 0 = no limit
-	public final static int PLANNER = 2;// It's only used when MAX_NUM_TRACES == 0 												  									
+	public final static int PLANNER = 3;// It's only used when MAX_NUM_TRACES == 0 												  									
 	//PLANNER = 1: CombinationPlanner generates all combinations of the input widgets
 	//PLANNER = 2: AdiacentPlanner generates all adiacent combinations of the input widgets
 	//PLANNER = 3: MinimalCoverageOfValuePlanner generates minimum number of combinations to assure total coverage of input values (of widgets)

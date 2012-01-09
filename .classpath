@@ -6,6 +6,6 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="lib" path="C:/Francesco/Specialistica/Tirocinio/ProgettoAndroid/Crawler/libs/androidtest.jar"/>
 	<classpathentry kind="lib" path="C:/Francesco/Specialistica/Tirocinio/ProgettoAndroid/Crawler/libs/robotium-solo-3.0.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ProvaAndroid"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SimpleLoanCalculator"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
