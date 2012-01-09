@@ -68,19 +68,40 @@ public class Automation implements Robot, Extractor, TaskProcessor {
 		this.theRobot.process (t);
 	}
 	
+//	public void process (Trace t) {
+//		Log.i ("nofatclips", "Restarting");
+//		this.restarter.restart();
+//		afterRestart();
+//		extractState();
+//		Log.i ("nofatclips", "Playing Trace " + t.getId());
+//		for (Transition step: t) {			
+//			for (UserInput i: step) {
+//				setInput(i);
+//			}			
+//			fireEvent (step.getEvent());
+//		}
+//	}
+	
 	public void process (Trace t) {
 		Log.i ("nofatclips", "Restarting");
-		this.restarter.restart();
+		this.restarter.restart();		
 		afterRestart();
+		//TEMPORANEO*************Aggiunto temporaneamente**********************
+		//Solo per l'applicazione sotto test SimpleLoanCalculator		
+				pressSpinnerItem(solo.getCurrentSpinners().get(0),0);
+				View v=solo.getView(2131230740);
+				if(((TextView)v).getText().equals("Hide"))
+					solo.clickOnView(v);
+		//*********************************************************************		
 		extractState();
 		Log.i ("nofatclips", "Playing Trace " + t.getId());
-		for (Transition step: t) {			
+		for (Transition step: t) {
 			for (UserInput i: step) {
 				setInput(i);
-			}			
+			}
 			fireEvent (step.getEvent());
 		}
-	}
+	}	
 
 	public void finalize() {
 		try {

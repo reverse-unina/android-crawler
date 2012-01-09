@@ -95,8 +95,8 @@ public class Resources {
 	public final static String CLASS_NAME = "ee.smkv.calc.loan.MainActivity";
 	public final static String FILE_NAME = "simpleLoanCalculator.xml";
 	public final static Comparator COMPARATOR = new CustomWidgetsDeepCountListComparator(CustomWidgetsComparator.IGNORE_ACTIVITY_NAME, BUTTON, LIST_VIEW, MENU_VIEW, IMAGE_VIEW);
-	public final static int SLEEP_AFTER_EVENT = 6000;
-	public final static int SLEEP_AFTER_RESTART = 2000;
+	public final static int SLEEP_AFTER_EVENT = 3000;
+	public final static int SLEEP_AFTER_RESTART = 0;
 	static {
 		UserFactory.addEvent(CLICK, BUTTON, TEXT_VIEW);
 	}
