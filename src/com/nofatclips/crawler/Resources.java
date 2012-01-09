@@ -258,9 +258,9 @@ public class Resources {
 	// User/Planner Parameters
 	public final static int MAX_EVENTS_PER_WIDGET = 12; // For GroupViews (0 = try all items in the group)
 	public final static int MAX_TASKS_PER_EVENT = 0; // How many input sequences to generate for each event on a widget; 0 = no limit
-	public final static int PLANNER = 3;// It's only used when MAX_NUM_TRACES == 0 												  									
+	public final static int PLANNER = 2;// It's only used when MAX_TASKS_PER_EVENT == 0 												  									
 	//PLANNER = 1: CombinationPlanner generates all combinations of the input widgets
-	//PLANNER = 2: AdiacentPlanner generates all adiacent combinations of the input widgets
+	//PLANNER = 2: AdjacentPlanner generates all adiacent combinations of the input widgets
 	//PLANNER = 3: MinimalCoverageOfValuePlanner generates minimum number of combinations to assure total coverage of input values (of widgets)
 	//PLANNER = incorrect value: MinimalCoverageOfValuePlanner as default planner
 	public final static boolean EVENT_WHEN_NO_ID = false; // Whether to inject events on widgets without ID or not
