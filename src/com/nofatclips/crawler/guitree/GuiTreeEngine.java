@@ -101,6 +101,7 @@ public class GuiTreeEngine extends Engine {
 		theGuiTree.setSleepOnThrobber(SLEEP_ON_THROBBER);
 		theGuiTree.setClassName(CLASS_NAME);
 		theGuiTree.setPackageName(PACKAGE_NAME);
+		theGuiTree.setInAndOutFocus(Boolean.toString(IN_AND_OUT_FOCUS));
 	}
 	
 	public Session getNewSession() {

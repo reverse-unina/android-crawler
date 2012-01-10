@@ -57,25 +57,25 @@ public class Resources {
 //		new AfterEventDontExplore("Remove Blog", "Add"),
 //	};
 
-//	// Wordpress 2 (Beta)
-//	public final static String PACKAGE_NAME = "org.wordpress.android";
-//	public final static String CLASS_NAME = "org.wordpress.android.Dashboard";
-//	public final static String FILE_NAME = "wordpress2.xml"; // Output
-//	public final static Comparator COMPARATOR = new CustomWidgetsComparator(EDIT_TEXT, BUTTON, MENU_VIEW, DIALOG_VIEW, LIST_VIEW);
-//	public final static int SLEEP_AFTER_EVENT = 6000;
-//	public final static int SLEEP_AFTER_RESTART = 1000;
-//	public final static StrategyCriteria[] ADDITIONAL_CRITERIAS = new StrategyCriteria[] {
-//		new AfterEventDontExplore("Remove Blog"),
-//		new AfterWidgetDontExplore (2131165200),
-//	};
-//	static {
-//		UserFactory.addEvent(CLICK, BUTTON, LINEAR_LAYOUT);
-//		UserFactory.denyInteractionOnIds(TYPE_TEXT, 2131165215, 2131165217); // Don't change user and password
-//		UserFactory.denyInteractionOnIds(CLICK, 2131165204, 2131165351); // Don't click Linear Layout container, don't check Geotag Posts
-//	}
-//	//	public final static InteractorAdapter[] ADDITIONAL_INPUTS = new InteractorAdapter[] { // Username and password
-//	//	new FixedValueEditor().addIdValuePair(2131165215, "").addIdValuePair(2131165217, ""),
-//	//};
+	// Wordpress 2 (Beta)
+	public final static String PACKAGE_NAME = "org.wordpress.android";
+	public final static String CLASS_NAME = "org.wordpress.android.Dashboard";
+	public final static String FILE_NAME = "wordpress2.xml"; // Output
+	public final static Comparator COMPARATOR = new CustomWidgetsComparator(EDIT_TEXT, BUTTON, MENU_VIEW, DIALOG_VIEW, LIST_VIEW);
+	public final static int SLEEP_AFTER_EVENT = 6000;
+	public final static int SLEEP_AFTER_RESTART = 1000;
+	public final static StrategyCriteria[] ADDITIONAL_CRITERIAS = new StrategyCriteria[] {
+		new AfterEventDontExplore("Remove Blog"),
+		new AfterWidgetDontExplore (2131165200),
+	};
+	static {
+		UserFactory.addEvent(CLICK, BUTTON, LINEAR_LAYOUT);
+		UserFactory.denyInteractionOnIds(TYPE_TEXT, 2131165215, 2131165217); // Don't change user and password
+		UserFactory.denyInteractionOnIds(CLICK, 2131165204, 2131165351); // Don't click Linear Layout container, don't check Geotag Posts
+	}
+	//	public final static InteractorAdapter[] ADDITIONAL_INPUTS = new InteractorAdapter[] { // Username and password
+	//	new FixedValueEditor().addIdValuePair(2131165215, "").addIdValuePair(2131165217, ""),
+	//};
 	
 //	public final static String PACKAGE_NAME = "PackageAndroid.Android";
 //	public final static String CLASS_NAME = "PackageAndroid.Android.ProvaAndroidActivity";
@@ -91,15 +91,15 @@ public class Resources {
 //	public final static int SLEEP_AFTER_EVENT = 4000;
 //	public final static int SLEEP_AFTER_RESTART = 4000;	
 	
-	public final static String PACKAGE_NAME = "ee.smkv.calc.loan";
-	public final static String CLASS_NAME = "ee.smkv.calc.loan.MainActivity";
-	public final static String FILE_NAME = "simpleLoanCalculator.xml";
-	public final static Comparator COMPARATOR = new CustomWidgetsDeepCountListComparator(CustomWidgetsComparator.IGNORE_ACTIVITY_NAME, BUTTON, LIST_VIEW, MENU_VIEW, IMAGE_VIEW);
-	public final static int SLEEP_AFTER_EVENT = 3000;
-	public final static int SLEEP_AFTER_RESTART = 0;
-	static {
-		UserFactory.addEvent(CLICK, BUTTON, TEXT_VIEW);
-	}
+//	public final static String PACKAGE_NAME = "ee.smkv.calc.loan";
+//	public final static String CLASS_NAME = "ee.smkv.calc.loan.MainActivity";
+//	public final static String FILE_NAME = "simpleLoanCalculator.xml";
+//	public final static Comparator COMPARATOR = new CustomWidgetsDeepCountListComparator(CustomWidgetsComparator.IGNORE_ACTIVITY_NAME, BUTTON, LIST_VIEW, MENU_VIEW, IMAGE_VIEW);
+//	public final static int SLEEP_AFTER_EVENT = 3000;
+//	public final static int SLEEP_AFTER_RESTART = 0;
+//	static {
+//		UserFactory.addEvent(CLICK, BUTTON, TEXT_VIEW);
+//	}
 	
 
 //	public final static String PACKAGE_NAME = "com.bwx.bequick";
@@ -245,7 +245,7 @@ public class Resources {
 	public final static int TRACE_MAX_DEPTH = 0; // Max number of transitions in a trace (0 = no depth limit)
 	public final static boolean CHECK_FOR_TRANSITION = false;
 //	public final static Comparator COMPARATOR = new CustomWidgetsComparator(EDIT_TEXT, BUTTON);
-	public final static StrategyCriteria[] ADDITIONAL_CRITERIAS = new StrategyCriteria[] {};
+//	public final static StrategyCriteria[] ADDITIONAL_CRITERIAS = new StrategyCriteria[] {};
 	
 	// Persistence Parameters
 	public final static int MAX_TRACES_IN_RAM = 20; // After performing this amount of traces, the crawler saves to disk, empties the session and continues (0 = keep all in RAM)
@@ -258,7 +258,7 @@ public class Resources {
 	// User/Planner Parameters
 	public final static int MAX_EVENTS_PER_WIDGET = 12; // For GroupViews (0 = try all items in the group)
 	public final static int MAX_TASKS_PER_EVENT = 0; // How many input sequences to generate for each event on a widget; 0 = no limit
-	public final static int PLANNER = 2;// It's only used when MAX_TASKS_PER_EVENT == 0 												  									
+	public final static int PLANNER = 3;// It's only used when MAX_TASKS_PER_EVENT == 0 												  									
 	//PLANNER = 1: CombinationPlanner generates all combinations of the input widgets
 	//PLANNER = 2: AdjacentPlanner generates all adiacent combinations of the input widgets
 	//PLANNER = 3: MinimalCoverageOfValuePlanner generates minimum number of combinations to assure total coverage of input values (of widgets)
