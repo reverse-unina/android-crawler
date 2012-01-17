@@ -141,6 +141,12 @@ public class UserFactory {
             ls.setEventWhenNoId(true);
             u.addEvent(addVetoes(ls));
             
+			// Events - Spinner
+			SpinnerSelector eventSS = (customizeEvent(SPINNER_SELECT))?
+					new SpinnerSelector (MAX_EVENTS_PER_WIDGET, typesForEvent(SPINNER_SELECT)):new SpinnerSelector(MAX_EVENTS_PER_WIDGET, SPINNER);
+			eventSS.setEventWhenNoId(true);
+			u.addEvent(addVetoes(eventSS));
+            
             // Events - Long Click List Item
             if (doLongClickOnLists()) {
                     ListLongClicker llc = (customizeEvent(LIST_LONG_SELECT))?
@@ -154,7 +160,7 @@ public class UserFactory {
             if (TAB_EVENTS_START_ONLY) {
                     ts.setOnlyOnce(true);
             }
-            u.addEvent(ts);
+            u.addEvent(ts);            
             
             // Inputs - Click
             Clicker c2 = (customizeInput(CLICK))?new Clicker (typesForInput(CLICK)):new Clicker (TOGGLE_BUTTON, CHECKBOX, RADIO);
@@ -167,7 +173,13 @@ public class UserFactory {
             // Inputs - Edit Text
             RandomEditor re = (customizeInput(TYPE_TEXT))?new RandomEditor(typesForInput(TYPE_TEXT)):new RandomEditor();
             re.setEventWhenNoId(false);
-            u.addInput (addVetoes(c2), addVetoes(sl), addVetoes(re));			
+            
+			//Inputs - Spinner
+			SpinnerSelector inputSS = (customizeInput(SPINNER_SELECT))?
+					new SpinnerSelector(typesForInput(SPINNER_SELECT)):new SpinnerSelector(SPINNER_INPUT);
+			inputSS.setEventWhenNoId(false);
+
+            u.addInput (addVetoes(c2), addVetoes(sl), addVetoes(re), addVetoes(inputSS));			
 			
 		} else {
 			u = (doForceSeed())?new AlternativeUser (a):new AlternativeUser(a,new Random(RANDOM_SEED));
