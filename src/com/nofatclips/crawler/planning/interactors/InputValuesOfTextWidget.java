@@ -28,10 +28,10 @@ public class InputValuesOfTextWidget implements InputType{
 		//TYPE_NUMBER_DECIMAL_MASK = hex(0x00002002)  int(8194)
 		int TYPE_NUMBER_DECIMAL_MASK = (TYPE_CLASS_NUMBER|TYPE_NUMBER_FLAG_DECIMAL);
 		if((TYPE_NUMBER_DECIMAL_MASK & type) == TYPE_NUMBER_DECIMAL_MASK){
-			String[] valuesList = new String[2];			
+			String[] valuesList = new String[3];			
 			valuesList[0] = "random";
 			valuesList[1] = "0";//valuesList[1]="-3.5";
-			//valuesList[2]="3.5";			
+			valuesList[2]="3.5";			
 			return valuesList;
 		}
 		
@@ -51,7 +51,7 @@ public class InputValuesOfTextWidget implements InputType{
 		int TYPE_TEXT_PASSWORD_MASK = (TYPE_TEXT_PASSWORD |TYPE_TEXT_FLAG_MULTI_LINE); 
 		if((TYPE_TEXT_PASSWORD_MASK & type) == TYPE_TEXT_PASSWORD_MASK){
 			String[] valuesList = new String[2];
-			valuesList[0] = "sunrise1"; //password valida
+			valuesList[0] = "";
 			valuesList[1] = "passwordNonValida";			
 			return valuesList;
 		}
