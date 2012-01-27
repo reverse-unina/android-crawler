@@ -28,10 +28,11 @@ public class InputValuesOfTextWidget implements InputType{
 		//TYPE_NUMBER_DECIMAL_MASK = hex(0x00002002)  int(8194)
 		int TYPE_NUMBER_DECIMAL_MASK = (TYPE_CLASS_NUMBER|TYPE_NUMBER_FLAG_DECIMAL);
 		if((TYPE_NUMBER_DECIMAL_MASK & type) == TYPE_NUMBER_DECIMAL_MASK){
-			String[] valuesList = new String[3];			
+			String[] valuesList = new String[4];			
 			valuesList[0] = "random";
-			valuesList[1] = "0";//valuesList[1]="-3.5";
+			valuesList[1] = "0";
 			valuesList[2]="3.5";			
+			valuesList[3]="-3.5";
 			return valuesList;
 		}
 		

@@ -60,9 +60,14 @@ public class WPCustomWidgetsComparator extends NameComparator {
 								 &&(campo.getSimpleType().equals("text"))
 								 &&((campo.getName().equals("Posts")||campo.getName().equals("Pages")))
 								  );
-			if ((matchClass(campo.getSimpleType()) && (id>0) )||(particullary)){
+			if ((matchClass(campo.getSimpleType()) && (id>0) ) &&(!particullary)){
 				Log.v("nofatclips","Comparing " + type + " #" + id);
 				if (!lookFor(campo, storedActivity)) return false;
+				checkedAlready.add(campo.getId()); // store widgets checked in this step to skip them in the next step
+			}
+			if (particullary){
+				Log.v("nofatclips","Comparing " + type + " #" + id);
+				if (!lookForParticullary(campo, storedActivity)) return false;
 				checkedAlready.add(campo.getId()); // store widgets checked in this step to skip them in the next step
 			}			
 		}
@@ -91,5 +96,14 @@ public class WPCustomWidgetsComparator extends NameComparator {
 		}
 		return false;
 	}
-	
+
+	protected boolean lookForParticullary (WidgetState campo, ActivityState activity) {
+		for (WidgetState altroCampo: activity) {
+			if ((matchWidget (altroCampo, campo))&&(campo.getName().equals(altroCampo.getName()))) {
+				return true;
+			}
+		}
+		return false;
+	}
+		
 }
