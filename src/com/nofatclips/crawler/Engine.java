@@ -132,6 +132,7 @@ public abstract class Engine extends ActivityInstrumentationTestCase2 implements
 
 		r.loadParameters();
 		r.setNotFirst();
+		r.saveStep();
 
 		return true;
 	}

@@ -60,9 +60,8 @@ public class Resources {
 	// Wordpress 2 (Beta)
 	public final static String PACKAGE_NAME = "org.wordpress.android";
 	public final static String CLASS_NAME = "org.wordpress.android.Dashboard";
-//	public final static String FILE_NAME = "wordpress2.xml"; // Output
-//	public final static Comparator COMPARATOR = new WPCustomWidgetsComparator(EDIT_TEXT, BUTTON, MENU_VIEW, DIALOG_VIEW, LIST_VIEW);
-	public final static Comparator COMPARATOR = new NullComparator();	
+	public final static Comparator COMPARATOR = new WPCustomWidgetsComparator(EDIT_TEXT, BUTTON, MENU_VIEW, DIALOG_VIEW, LIST_VIEW);
+//	public final static Comparator COMPARATOR = new NullComparator();	
 	public final static int SLEEP_AFTER_EVENT = 6000;
 	public final static int SLEEP_AFTER_RESTART = 1000;
 	public final static StrategyCriteria[] ADDITIONAL_CRITERIAS = new StrategyCriteria[] {
@@ -204,10 +203,9 @@ public class Resources {
 
 //	public final static String PACKAGE_NAME = "ee.smkv.calc.loan";
 //	public final static String CLASS_NAME = "ee.smkv.calc.loan.MainActivity";
-//	public final static String FILE_NAME = "loan.xml"; // Output
 //	public final static Comparator COMPARATOR = new CustomWidgetsComparator(TEXT_VIEW, DIALOG_VIEW, MENU_VIEW, BUTTON);
 //	public final static int SLEEP_AFTER_EVENT = 2000;
-//	public final static int SLEEP_AFTER_RESTART = 0;
+//	public final static int SLEEP_AFTER_RESTART = 1000;
 
 	/*
 	 * 				Default Parameters
@@ -218,7 +216,7 @@ public class Resources {
 	public final static int PAUSE_AFTER_TRACES = 1; // After performing this amount of traces, the crawler pauses (0 = no pause)
 	public final static long MAX_TIME_CRAWLING = 0; // In seconds (0 = no time limit)
 	public final static long PAUSE_AFTER_TIME = 0; // In seconds (0 = no pause)
-	public final static int TRACE_MAX_DEPTH = 3; // Max number of transitions in a trace (0 = no depth limit)
+	public final static int TRACE_MAX_DEPTH = 0; // Max number of transitions in a trace (0 = no depth limit)
 	public final static boolean CHECK_FOR_TRANSITION = false;
 //	public final static Comparator COMPARATOR = new CustomWidgetsComparator(EDIT_TEXT, BUTTON);
 //	public final static StrategyCriteria[] ADDITIONAL_CRITERIAS = new StrategyCriteria[] {};
@@ -233,7 +231,7 @@ public class Resources {
 	
 	// User/Planner Parameters
 	public final static int MAX_EVENTS_PER_WIDGET = 12; // For GroupViews (0 = try all items in the group)
-	public final static int MAX_TASKS_PER_EVENT = 0; // How many input sequences to generate for each event on a widget; 0 = no limit
+	public final static int MAX_TASKS_PER_EVENT = 1; // How many input sequences to generate for each event on a widget; 0 = no limit
 	public final static int PLANNER = 3;// It's only used when MAX_TASKS_PER_EVENT == 0 												  									
 	//PLANNER = 1: CombinationPlanner generates all combinations of the input widgets
 	//PLANNER = 2: AdjacentPlanner generates all adiacent combinations of the input widgets

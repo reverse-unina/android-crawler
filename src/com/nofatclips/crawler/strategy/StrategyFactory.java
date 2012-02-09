@@ -70,7 +70,7 @@ public class StrategyFactory {
 	}
 	
 	public boolean useCustomStrategy () {
-		return (checkTransition() || checkForDepth() || checkSessionTime() || hasMoreCriterias());
+		return (checkTransition() || checkForDepth() || checkSessionTime() || hasMoreCriterias() || checkTracesForPause() || checkSessionTimeForPause());
 	}
 	
 	public boolean checkForDepth() {
