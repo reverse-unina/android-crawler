@@ -161,7 +161,33 @@ public class SimplePlanner implements Planner {
 		
 		if (USE_GPS && a.getUsesLocationManager())
 		{
+			evt = null;
+			
+			//genero i valori di test
+			float[] location = new float[3];
+			location[0] = 20.0f; //latitude
+			location[1] = 20.0f; //longitude
+			location[2] = 10.0f; //altitude
 
+			//definisco gli input
+			Collection<UserInput> inputs = new ArrayList<UserInput>();
+			
+			if (EXCLUDE_WIDGETS_INPUTS_IN_SENSORS_EVENTS == false)
+			{
+				for (WidgetState formWidget: getInputFilter()) {
+					List<UserInput> alternatives = getFormFiller().handleInput(formWidget); 
+					UserInput inp = ((alternatives.size()>0)?alternatives.get(alternatives.size()-1):null);
+					if (inp != null) {
+						inputs.add(inp);
+					}
+				}
+			}
+			
+			String locationInputValueStr = location[0] + "|" + location[1] + "|" + location[2];
+			evt = getAbstractor().createEvent(null, LOCATION_CHANGE_EVENT);
+			evt.setValue(locationInputValueStr);
+			t = getAbstractor().createStep(a, inputs, evt);
+			p.addTask(t);		
 		}
 		/** @author nicola amatucci */
 		

@@ -1,8 +1,31 @@
 package com.nofatclips.crawler.guitree;
 
+import static com.nofatclips.crawler.Resources.ACTIVITY_DESCRIPTION_IN_SESSION;
+import static com.nofatclips.crawler.Resources.ACTIVITY_LIST_FILE_NAME;
+import static com.nofatclips.crawler.Resources.ADDITIONAL_CRITERIAS;
+import static com.nofatclips.crawler.Resources.CHECK_FOR_TRANSITION;
+import static com.nofatclips.crawler.Resources.CLASS_NAME;
+import static com.nofatclips.crawler.Resources.COMPARATOR;
+import static com.nofatclips.crawler.Resources.EXPLORE_ONLY_NEW_STATES;
+import static com.nofatclips.crawler.Resources.IN_AND_OUT_FOCUS;
+import static com.nofatclips.crawler.Resources.MAX_NUM_TRACES;
+import static com.nofatclips.crawler.Resources.MAX_TIME_CRAWLING;
+import static com.nofatclips.crawler.Resources.MAX_TRACES_IN_RAM;
+import static com.nofatclips.crawler.Resources.PACKAGE_NAME;
+import static com.nofatclips.crawler.Resources.PAUSE_AFTER_TIME;
+import static com.nofatclips.crawler.Resources.PAUSE_AFTER_TRACES;
+import static com.nofatclips.crawler.Resources.SLEEP_AFTER_EVENT;
+import static com.nofatclips.crawler.Resources.SLEEP_AFTER_RESTART;
+import static com.nofatclips.crawler.Resources.SLEEP_ON_THROBBER;
+import static com.nofatclips.crawler.Resources.TRACE_MAX_DEPTH;
+import static com.nofatclips.crawler.Resources.USE_GPS;
+
 import java.util.GregorianCalendar;
 
 import javax.xml.parsers.ParserConfigurationException;
+
+import android.content.Context;
+import android.location.LocationManager;
 
 import com.nofatclips.androidtesting.guitree.GuiTree;
 import com.nofatclips.androidtesting.model.Session;
@@ -18,9 +41,7 @@ import com.nofatclips.crawler.planning.SimplePlanner;
 import com.nofatclips.crawler.planning.TraceDispatcher;
 import com.nofatclips.crawler.planning.UserFactory;
 import com.nofatclips.crawler.storage.PersistenceFactory;
-import com.nofatclips.crawler.strategy.*;
-
-import static com.nofatclips.crawler.Resources.*;
+import com.nofatclips.crawler.strategy.StrategyFactory;
 
 public class GuiTreeEngine extends Engine {
 
@@ -101,8 +122,29 @@ public class GuiTreeEngine extends Engine {
 		if (!ACTIVITY_DESCRIPTION_IN_SESSION) {
 			theGuiTree.setStateFileName(ACTIVITY_LIST_FILE_NAME);
 		}
+		
+		/** @author nicola amatucci */
+		if (USE_GPS)
+		{
+			//attivo il LocationManager e il provider di test
+			theAutomation.locationManager = (LocationManager) this.getActivity().getSystemService(Context.LOCATION_SERVICE);
+			theAutomation.mocLocationProvider = LocationManager.GPS_PROVIDER;
+			theAutomation.locationManager.addTestProvider(theAutomation.mocLocationProvider, false, false, false, false, true, true, true, 0, 5);
+			theAutomation.locationManager.setTestProviderEnabled(theAutomation.mocLocationProvider, true);
+		}
+		/** @author nicola amatucci */
 	}
 	
+	
+	/** @author nicola amatucci */
+	@Override
+	protected void tearDown() throws Exception
+	{
+		theAutomation.locationManager.removeTestProvider(theAutomation.mocLocationProvider);
+		super.tearDown();
+	}
+	/** @author nicola amatucci */
+
 	public Session getNewSession() {
 		try {
 			return new GuiTree();
@@ -122,6 +164,5 @@ public class GuiTreeEngine extends Engine {
 	private UserAdapter user;
 	private BasicRestarter theRestarter;
 	private GuiTree theGuiTree;
-//	private Persistence diskWriter;
-	
+//	private Persistence diskWriter;	
 }

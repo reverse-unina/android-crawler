@@ -1,8 +1,37 @@
 package com.nofatclips.crawler.automation;
 
-import static com.nofatclips.crawler.Resources.*;
-import static com.nofatclips.androidtesting.model.InteractionType.*;
-import static com.nofatclips.androidtesting.model.SimpleType.*;
+import static android.content.Context.WINDOW_SERVICE;
+import static android.view.Surface.ROTATION_0;
+import static android.view.Surface.ROTATION_180;
+import static com.nofatclips.androidtesting.model.InteractionType.ACCELEROMETER_SENSOR_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.AMBIENT_TEMPERATURE_SENSOR_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.BACK;
+import static com.nofatclips.androidtesting.model.InteractionType.CHANGE_ORIENTATION;
+import static com.nofatclips.androidtesting.model.InteractionType.CLICK;
+import static com.nofatclips.androidtesting.model.InteractionType.CLICK_ON_TEXT;
+import static com.nofatclips.androidtesting.model.InteractionType.LIST_LONG_SELECT;
+import static com.nofatclips.androidtesting.model.InteractionType.LIST_SELECT;
+import static com.nofatclips.androidtesting.model.InteractionType.LOCATION_CHANGE_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.LONG_CLICK;
+import static com.nofatclips.androidtesting.model.InteractionType.MAGNETIC_FIELD_SENSOR_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.OPEN_MENU;
+import static com.nofatclips.androidtesting.model.InteractionType.ORIENTATION_SENSOR_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.SCROLL_DOWN;
+import static com.nofatclips.androidtesting.model.InteractionType.SET_BAR;
+import static com.nofatclips.androidtesting.model.InteractionType.SPINNER_SELECT;
+import static com.nofatclips.androidtesting.model.InteractionType.SWAP_TAB;
+import static com.nofatclips.androidtesting.model.InteractionType.TEMPERATURE_SENSOR_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.TYPE_TEXT;
+import static com.nofatclips.androidtesting.model.SimpleType.BUTTON;
+import static com.nofatclips.androidtesting.model.SimpleType.MENU_ITEM;
+import static com.nofatclips.crawler.Resources.FORCE_RESTART;
+import static com.nofatclips.crawler.Resources.IN_AND_OUT_FOCUS;
+import static com.nofatclips.crawler.Resources.PRECRAWLING;
+import static com.nofatclips.crawler.Resources.SLEEP_AFTER_EVENT;
+import static com.nofatclips.crawler.Resources.SLEEP_AFTER_RESTART;
+import static com.nofatclips.crawler.Resources.SLEEP_ON_THROBBER;
+import static com.nofatclips.crawler.Resources.USE_GPS;
+import static com.nofatclips.crawler.Resources.USE_SENSORS;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,19 +40,37 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.app.Instrumentation;
+import android.content.Context;
 import android.graphics.Bitmap;
-//import android.app.Instrumentation;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
-import android.view.*;
-import android.widget.*;
+import android.view.Display;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
+import android.widget.Spinner;
+import android.widget.TabHost;
+import android.widget.TextView;
 
 import com.jayway.android.robotium.solo.Solo;
-import com.nofatclips.androidtesting.model.*;
-import com.nofatclips.crawler.model.*;
-
-import static android.content.Context.WINDOW_SERVICE;
-import static android.view.Surface.*;
+import com.nofatclips.androidtesting.model.Trace;
+import com.nofatclips.androidtesting.model.Transition;
+import com.nofatclips.androidtesting.model.UserEvent;
+import com.nofatclips.androidtesting.model.UserInput;
+import com.nofatclips.crawler.model.ActivityDescription;
+import com.nofatclips.crawler.model.Extractor;
+import com.nofatclips.crawler.model.ImageCaptor;
+import com.nofatclips.crawler.model.Restarter;
+import com.nofatclips.crawler.model.Robot;
+import com.nofatclips.crawler.model.TaskProcessor;
 
 // Automation implements the methods to interact with the application via the Instrumentation (Robot)
 // and to extract informations from it (Extractor); the Robotium framework is used where possible
@@ -45,6 +92,12 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 	private UserEvent currentEvent;
 	private ImageCaptor imageCaptor;
 		
+	/** @author nicola amatucci */
+	//settati da GuiTreeEngine.setUp()
+	public LocationManager locationManager;
+	public String mocLocationProvider;
+	/** @author nicola amatucci */
+	
 	// A Trivial Extractor is provided if none is assigned
 	public Automation () {
 		TrivialExtractor te = new TrivialExtractor(); 
@@ -223,6 +276,9 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 					interactionType.equals(AMBIENT_TEMPERATURE_SENSOR_EVENT)
 					) {
 				fireSensorEvent(value, interactionType);
+				
+		} else if ( interactionType.equals(LOCATION_CHANGE_EVENT) ) {
+			fireLocationChangeEvent(value);
 			/** @author nicola amatucci */
 		} else {
 			
@@ -234,17 +290,42 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 	/** @author nicola amatucci */	
 	private void fireSensorEvent(String value, String interactionType)
 	{
-		String[] stringValues = value.split("\\|");
-		
-		if (stringValues != null && stringValues.length == 3)
+		if (value != null && interactionType != null)
 		{
-			float[] floatValues = new float[3];
-			floatValues[0] = Float.parseFloat(stringValues[0]);
-			floatValues[1] = Float.parseFloat(stringValues[1]);
-			floatValues[2] = Float.parseFloat(stringValues[2]);
+			String[] stringValues = value.split("\\|");
 			
+			if (stringValues != null && stringValues.length == 3)
+			{
+				float[] floatValues = new float[3];
+				floatValues[0] = Float.parseFloat(stringValues[0]);
+				floatValues[1] = Float.parseFloat(stringValues[1]);
+				floatValues[2] = Float.parseFloat(stringValues[2]);
+				
+				
+				
+			}
+		}
+	}
+	
+	private void fireLocationChangeEvent(String value)
+	{
+		if (value != null)
+		{
+			String[] stringValues = value.split("\\|");
 			
-			
+			if (stringValues != null && stringValues.length == 3)
+			{
+				float[] floatValues = new float[3];
+				floatValues[0] = Float.parseFloat(stringValues[0]); //latitude
+				floatValues[1] = Float.parseFloat(stringValues[1]); //longitude
+				floatValues[2] = Float.parseFloat(stringValues[2]); //altitude
+				
+		        Location location = new Location(mocLocationProvider);
+		        location.setLatitude(floatValues[0]);
+		        location.setLongitude(floatValues[1]);
+		        location.setAltitude(floatValues[2]);
+		        locationManager.setTestProviderLocation(mocLocationProvider, location);
+			}
 		}
 	}
 	/** @author nicola amatucci */
