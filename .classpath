@@ -4,11 +4,8 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="lib" path="/Android Test/src/com/nofatclips/androidtesting/guitree" sourcepath="/Android Test/src/com/nofatclips/androidtesting/guitree"/>
-	<classpathentry kind="lib" path="/Android Test/src/com/nofatclips/androidtesting/model" sourcepath="/Android Test/src/com/nofatclips/androidtesting/model"/>
-	<classpathentry kind="lib" path="/Android Test/src/com/nofatclips/androidtesting/xml" sourcepath="/Android Test/src/com/nofatclips/androidtesting/xml"/>
-	<classpathentry kind="src" path="/Android Test"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="lib" path="libs/robotium-solo-3.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/AndroidTest"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

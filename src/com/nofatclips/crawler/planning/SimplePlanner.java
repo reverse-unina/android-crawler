@@ -82,6 +82,89 @@ public class SimplePlanner implements Planner {
 			p.addTask(t);
 		}
 
+		/** @author nicola amatucci */
+		if (USE_SENSORS && a.getUsesSensorsManager())
+		{
+			evt = null;
+			for (Integer type : SENSOR_TYPES)
+			{	
+				float[] sensorInputValues = null;					
+				String sensorInteractionType = null;
+				
+				switch(type)
+				{
+					case android.hardware.Sensor.TYPE_ACCELEROMETER: {
+						Log.i("nofatclips", "Creating trace for accelerometer");
+						sensorInteractionType = ACCELEROMETER_SENSOR_EVENT;
+						sensorInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateAccelerometerValues();							
+						break;
+					}
+					
+					case android.hardware.Sensor.TYPE_ORIENTATION: {
+						Log.i("nofatclips", "Creating trace for orientation");
+						sensorInteractionType = ORIENTATION_SENSOR_EVENT;
+						sensorInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateOrientationValues();
+						break;
+					}
+					
+					case android.hardware.Sensor.TYPE_MAGNETIC_FIELD: {
+						Log.i("nofatclips", "Creating trace for magnetic field");
+						sensorInteractionType = MAGNETIC_FIELD_SENSOR_EVENT;
+						sensorInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateMagneticFieldValues();
+						break;
+					}
+					
+					case android.hardware.Sensor.TYPE_TEMPERATURE: {
+						Log.i("nofatclips", "Creating trace for temperature");
+						sensorInteractionType = TEMPERATURE_SENSOR_EVENT;
+						sensorInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateTemperatureValues();
+						break;
+					}						
+
+					/* TYPE_TEMPERATURE e' deprecato nelle api 14
+					
+					case android.hardware.Sensor.TYPE_AMBIENT_TEMPERATURE: {
+						Log.i("nofatclips", "Creating trace for temperature");
+						sensorInteractionType = AMBIENT_TEMPERATURE_SENSOR_EVENT;
+						sensorInputValues = it.unina.android.utils.SensorValuesGenerator.generateAmbientTemperatureValues();
+						break;
+					}
+					
+					*/
+				}
+				
+				//caso in cui il sensore non e' supportato
+				if (sensorInteractionType == null) continue;
+				
+				//definisco gli input
+				Collection<UserInput> inputs = new ArrayList<UserInput>();
+				
+				if (EXCLUDE_WIDGETS_INPUTS_IN_SENSORS_EVENTS == false)
+				{
+					for (WidgetState formWidget: getInputFilter()) {
+						List<UserInput> alternatives = getFormFiller().handleInput(formWidget); 
+						UserInput inp = ((alternatives.size()>0)?alternatives.get(alternatives.size()-1):null);
+						if (inp != null) {
+							inputs.add(inp);
+						}
+					}
+				}
+
+				//creo l'evento relativo al sensore
+				String sensorInputValueStr = sensorInputValues[0] + "|" + sensorInputValues[1] + "|" + sensorInputValues[2];
+				evt = getAbstractor().createEvent(null, sensorInteractionType);
+				evt.setValue(sensorInputValueStr);
+				t = getAbstractor().createStep(a, inputs, evt);
+				p.addTask(t);
+			}	
+		}
+		
+		if (USE_GPS && a.getUsesLocationManager())
+		{
+
+		}
+		/** @author nicola amatucci */
+		
 		return p;
 	}
 	

@@ -325,6 +325,28 @@ public class Resources {
 	public final static String XML_BODY_END = "/TRACE>";
 	public final static CrawlerLog LOGGER = new SessionLogger();
 
+	/** @author nicola amatucci */
+	//Sensor events on/off
+	public static boolean USE_SENSORS = true;
+	public static boolean USE_GPS = true;
+	public static boolean EXCLUDE_WIDGETS_INPUTS_IN_SENSORS_EVENTS = false;
+	
+	//Sensors used
+	public final static Integer[] SENSOR_TYPES = new Integer[] {
+		android.hardware.Sensor.TYPE_ACCELEROMETER,
+		android.hardware.Sensor.TYPE_ORIENTATION,
+		android.hardware.Sensor.TYPE_MAGNETIC_FIELD,
+		android.hardware.Sensor.TYPE_TEMPERATURE
+		//android.hardware.Sensor.TYPE_GRAVITY
+		//android.hardware.Sensor.TYPE_GYROSCOPE
+		//android.hardware.Sensor.TYPE_LIGHT
+		//android.hardware.Sensor.TYPE_LINEAR_ACCELERATION
+		//android.hardware.Sensor.TYPE_PRESSURE
+		//android.hardware.Sensor.TYPE_PROXIMITY
+		//android.hardware.Sensor.TYPE_ROTATION_VECTOR
+	};
+	/** @author nicola amatucci */
+	
 	public static Class<?> theClass;
 	static {
 		try {

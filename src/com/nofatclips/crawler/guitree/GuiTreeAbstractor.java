@@ -134,6 +134,13 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 				f.loadItem(v, w);
 			}
 		}
+		
+		/** @author nicola amatucci */
+		//sensors
+		newActivity.setUsesSensorsManager(desc.usesSensorsManager());
+		newActivity.setUsesLocationManager(desc.usesLocationManager());
+		/** @author nicola amatucci */
+
 		return hasDescription;
 	}
 	

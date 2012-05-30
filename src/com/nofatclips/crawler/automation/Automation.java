@@ -212,12 +212,43 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 		} else if (interactionType.equals(TYPE_TEXT)) {
 			solo.enterText((EditText)v, value);
 		} else if (interactionType.equals(SET_BAR)) {
-			solo.setProgressBar((ProgressBar)v, Integer.parseInt(value));
+			solo.setProgressBar((ProgressBar)v, Integer.parseInt(value));		
+			
+			/** @author nicola amatucci */
+		} else  if (
+					interactionType.equals(ORIENTATION_SENSOR_EVENT) ||
+					interactionType.equals(ACCELEROMETER_SENSOR_EVENT) ||
+					interactionType.equals(MAGNETIC_FIELD_SENSOR_EVENT) ||
+					interactionType.equals(TEMPERATURE_SENSOR_EVENT) ||
+					interactionType.equals(AMBIENT_TEMPERATURE_SENSOR_EVENT)
+					) {
+				fireSensorEvent(value, interactionType);
+			/** @author nicola amatucci */
 		} else {
+			
+			
 			return;
 		}
 	}
 
+	/** @author nicola amatucci */	
+	private void fireSensorEvent(String value, String interactionType)
+	{
+		String[] stringValues = value.split("\\|");
+		
+		if (stringValues != null && stringValues.length == 3)
+		{
+			float[] floatValues = new float[3];
+			floatValues[0] = Float.parseFloat(stringValues[0]);
+			floatValues[1] = Float.parseFloat(stringValues[1]);
+			floatValues[2] = Float.parseFloat(stringValues[2]);
+			
+			
+			
+		}
+	}
+	/** @author nicola amatucci */
+	
 	// Scroll the view to the top. Only works for ListView and ScrollView. Support for GridView and others must be added
 	public void home () {
 		
@@ -648,6 +679,27 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 				public String toString() {
 					return getActivityName();
 				}
+				
+				/** @author nicola amatucci */
+				public boolean usesSensorsManager()
+				{
+					//it.unina.android.hardware.SensorEventListener
+					//android.hardware.SensorEventListener
+					//TODO: cambiare a seconda delle decisioni prese
+					if (USE_SENSORS)
+						return com.nofatclips.crawler.automation.sensors_utils.ReflectorHelper.scanClassForInterface(getActivity().getClass(), "android.hardware.SensorEventListener");
+					else
+						return false;
+				}
+				
+				public boolean usesLocationManager()
+				{
+					if (USE_GPS)
+						return com.nofatclips.crawler.automation.sensors_utils.ReflectorHelper.scanClassForInterface(getActivity().getClass(), "android.location.LocationListener");
+					else
+						return false;
+				}
+				/** @author nicola amatucci */
 
 			};
 		}
