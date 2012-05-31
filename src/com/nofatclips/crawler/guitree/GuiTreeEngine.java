@@ -19,6 +19,7 @@ import static com.nofatclips.crawler.Resources.SLEEP_AFTER_RESTART;
 import static com.nofatclips.crawler.Resources.SLEEP_ON_THROBBER;
 import static com.nofatclips.crawler.Resources.TRACE_MAX_DEPTH;
 import static com.nofatclips.crawler.Resources.USE_GPS;
+import static com.nofatclips.crawler.Resources.TEST_LOCATION_PROVIDER;
 
 import java.util.GregorianCalendar;
 
@@ -128,9 +129,8 @@ public class GuiTreeEngine extends Engine {
 		{
 			//attivo il LocationManager e il provider di test
 			theAutomation.locationManager = (LocationManager) this.getActivity().getSystemService(Context.LOCATION_SERVICE);
-			theAutomation.mocLocationProvider = LocationManager.GPS_PROVIDER;
-			theAutomation.locationManager.addTestProvider(theAutomation.mocLocationProvider, false, false, false, false, true, true, true, 0, 5);
-			theAutomation.locationManager.setTestProviderEnabled(theAutomation.mocLocationProvider, true);
+			theAutomation.locationManager.addTestProvider(TEST_LOCATION_PROVIDER, false, false, false, false, true, true, true, 0, 5);
+			theAutomation.locationManager.setTestProviderEnabled(TEST_LOCATION_PROVIDER, true);
 		}
 		/** @author nicola amatucci */
 	}
@@ -140,7 +140,7 @@ public class GuiTreeEngine extends Engine {
 	@Override
 	protected void tearDown() throws Exception
 	{
-		theAutomation.locationManager.removeTestProvider(theAutomation.mocLocationProvider);
+		theAutomation.locationManager.removeTestProvider(TEST_LOCATION_PROVIDER);
 		super.tearDown();
 	}
 	/** @author nicola amatucci */

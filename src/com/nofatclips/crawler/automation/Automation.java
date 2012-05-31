@@ -32,6 +32,7 @@ import static com.nofatclips.crawler.Resources.SLEEP_AFTER_RESTART;
 import static com.nofatclips.crawler.Resources.SLEEP_ON_THROBBER;
 import static com.nofatclips.crawler.Resources.USE_GPS;
 import static com.nofatclips.crawler.Resources.USE_SENSORS;
+import static com.nofatclips.crawler.Resources.TEST_LOCATION_PROVIDER;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,9 +41,7 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.app.Instrumentation;
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.test.ActivityInstrumentationTestCase2;
@@ -95,7 +94,6 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 	/** @author nicola amatucci */
 	//settati da GuiTreeEngine.setUp()
 	public LocationManager locationManager;
-	public String mocLocationProvider;
 	/** @author nicola amatucci */
 	
 	// A Trivial Extractor is provided if none is assigned
@@ -315,16 +313,16 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 			
 			if (stringValues != null && stringValues.length == 3)
 			{
-				float[] floatValues = new float[3];
-				floatValues[0] = Float.parseFloat(stringValues[0]); //latitude
-				floatValues[1] = Float.parseFloat(stringValues[1]); //longitude
-				floatValues[2] = Float.parseFloat(stringValues[2]); //altitude
+				double[] doubleValues = new double[3];
+				doubleValues[0] = Double.parseDouble(stringValues[0]); //latitude
+				doubleValues[1] = Double.parseDouble(stringValues[1]); //longitude
+				doubleValues[2] = Double.parseDouble(stringValues[2]); //altitude
 				
-		        Location location = new Location(mocLocationProvider);
-		        location.setLatitude(floatValues[0]);
-		        location.setLongitude(floatValues[1]);
-		        location.setAltitude(floatValues[2]);
-		        locationManager.setTestProviderLocation(mocLocationProvider, location);
+		        Location location = new Location(TEST_LOCATION_PROVIDER);
+		        location.setLatitude(doubleValues[0]);
+		        location.setLongitude(doubleValues[1]);
+		        location.setAltitude(doubleValues[2]);
+		        locationManager.setTestProviderLocation(TEST_LOCATION_PROVIDER, location);
 			}
 		}
 	}

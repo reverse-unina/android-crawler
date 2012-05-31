@@ -9,6 +9,8 @@ import com.nofatclips.crawler.storage.*;
 import com.nofatclips.crawler.strategy.comparator.*;
 import com.nofatclips.crawler.planning.interactors.*;
 import com.nofatclips.crawler.strategy.criteria.*;
+
+import android.location.LocationManager;
 import android.util.Log;
 
 import static com.nofatclips.androidtesting.model.SimpleType.*;
@@ -345,6 +347,9 @@ public class Resources {
 		//android.hardware.Sensor.TYPE_PROXIMITY
 		//android.hardware.Sensor.TYPE_ROTATION_VECTOR
 	};
+	
+	//location provider
+	public static final String TEST_LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
 	/** @author nicola amatucci */
 	
 	public static Class<?> theClass;
