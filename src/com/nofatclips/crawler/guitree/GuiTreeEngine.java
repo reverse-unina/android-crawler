@@ -129,8 +129,20 @@ public class GuiTreeEngine extends Engine {
 		{
 			//attivo il LocationManager e il provider di test
 			theAutomation.locationManager = (LocationManager) this.getActivity().getSystemService(Context.LOCATION_SERVICE);
+			/* 
+			 * addTestProvider(	String name,
+			 * 					boolean requiresNetwork,
+			 * 					boolean requiresSatellite,
+			 * 					boolean requiresCell,
+			 * 					boolean hasMonetaryCost,
+			 * 					boolean supportsAltitude,
+			 * 					boolean supportsSpeed,
+			 * 					boolean supportsBearing,
+			 * 					int powerRequirement,
+			 * 					int accuracy)
+			 */
 			theAutomation.locationManager.addTestProvider(TEST_LOCATION_PROVIDER, false, false, false, false, true, true, true, 0, 5);
-			theAutomation.locationManager.setTestProviderEnabled(TEST_LOCATION_PROVIDER, true);
+			theAutomation.locationManager.setTestProviderEnabled(TEST_LOCATION_PROVIDER, false);
 		}
 		/** @author nicola amatucci */
 	}

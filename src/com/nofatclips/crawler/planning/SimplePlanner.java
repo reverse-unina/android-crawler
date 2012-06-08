@@ -3,12 +3,13 @@ package com.nofatclips.crawler.planning;
 import static com.nofatclips.androidtesting.model.InteractionType.ACCELEROMETER_SENSOR_EVENT;
 import static com.nofatclips.androidtesting.model.InteractionType.BACK;
 import static com.nofatclips.androidtesting.model.InteractionType.CHANGE_ORIENTATION;
-import static com.nofatclips.androidtesting.model.InteractionType.LOCATION_CHANGE_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.GPS_LOCATION_CHANGE_EVENT;
 import static com.nofatclips.androidtesting.model.InteractionType.MAGNETIC_FIELD_SENSOR_EVENT;
 import static com.nofatclips.androidtesting.model.InteractionType.OPEN_MENU;
 import static com.nofatclips.androidtesting.model.InteractionType.ORIENTATION_SENSOR_EVENT;
 import static com.nofatclips.androidtesting.model.InteractionType.SCROLL_DOWN;
 import static com.nofatclips.androidtesting.model.InteractionType.TEMPERATURE_SENSOR_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.GPS_PROVIDER_DISABLE_EVENT;
 import static com.nofatclips.crawler.Resources.BACK_BUTTON_EVENT;
 import static com.nofatclips.crawler.Resources.EXCLUDE_WIDGETS_INPUTS_IN_SENSORS_EVENTS;
 import static com.nofatclips.crawler.Resources.MENU_EVENTS;
@@ -188,12 +189,6 @@ public class SimplePlanner implements Planner {
 		if (USE_GPS && a.getUsesLocationManager())
 		{
 			evt = null;
-			
-			//genero i valori di test
-			double[] location = new double[3];
-			location[0] = GpsValuesGenerator.getRandomLatitude(); //latitude
-			location[1] = GpsValuesGenerator.getRandomLatitude(); //longitude
-			location[2] = GpsValuesGenerator.getRandomAltitude(); //altitude
 
 			//definisco gli input
 			Collection<UserInput> inputs = new ArrayList<UserInput>();
@@ -209,11 +204,44 @@ public class SimplePlanner implements Planner {
 				}
 			}
 			
-			String locationInputValueStr = location[0] + "|" + location[1] + "|" + location[2];
-			evt = getAbstractor().createEvent(null, LOCATION_CHANGE_EVENT);
+			//random
+			String locationInputValueStr = 	GpsValuesGenerator.getRandomLatitude() + "|" +
+											GpsValuesGenerator.getRandomLongitude() + "|" +
+											GpsValuesGenerator.getRandomAltitude();			
+			evt = getAbstractor().createEvent(null, GPS_LOCATION_CHANGE_EVENT);
 			evt.setValue(locationInputValueStr);
 			t = getAbstractor().createStep(a, inputs, evt);
 			p.addTask(t);	
+			
+			//+ + +
+			locationInputValueStr = GpsValuesGenerator.getRandomPositiveLatitude() + "|" +
+									GpsValuesGenerator.getRandomPositiveLongitude() + "|" +
+									GpsValuesGenerator.getRandomPositiveAltitude();			
+			evt = getAbstractor().createEvent(null, GPS_LOCATION_CHANGE_EVENT);
+			evt.setValue(locationInputValueStr);
+			t = getAbstractor().createStep(a, inputs, evt);
+			p.addTask(t);
+			
+			//- - -
+			locationInputValueStr = GpsValuesGenerator.getRandomNegativeLatitude() + "|" +
+									GpsValuesGenerator.getRandomNegativeLongitude() + "|" +
+									GpsValuesGenerator.getRandomNegativeAltitude();			
+			evt = getAbstractor().createEvent(null, GPS_LOCATION_CHANGE_EVENT);
+			evt.setValue(locationInputValueStr);
+			t = getAbstractor().createStep(a, inputs, evt);
+			p.addTask(t);
+			
+			//0 0 0
+			locationInputValueStr = "0|0|0";			
+			evt = getAbstractor().createEvent(null, GPS_LOCATION_CHANGE_EVENT);
+			evt.setValue(locationInputValueStr);
+			t = getAbstractor().createStep(a, inputs, evt);
+			p.addTask(t);
+			
+			//evento "disabilita provider"
+			//evt = getAbstractor().createEvent(null, GPS_PROVIDER_DISABLE_EVENT);
+			//t = getAbstractor().createStep(a, inputs, evt);
+			//p.addTask(t);
 		}
 		/** @author nicola amatucci */
 		

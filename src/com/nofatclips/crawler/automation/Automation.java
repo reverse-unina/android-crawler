@@ -9,9 +9,10 @@ import static com.nofatclips.androidtesting.model.InteractionType.BACK;
 import static com.nofatclips.androidtesting.model.InteractionType.CHANGE_ORIENTATION;
 import static com.nofatclips.androidtesting.model.InteractionType.CLICK;
 import static com.nofatclips.androidtesting.model.InteractionType.CLICK_ON_TEXT;
+import static com.nofatclips.androidtesting.model.InteractionType.GPS_LOCATION_CHANGE_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.GPS_PROVIDER_DISABLE_EVENT;
 import static com.nofatclips.androidtesting.model.InteractionType.LIST_LONG_SELECT;
 import static com.nofatclips.androidtesting.model.InteractionType.LIST_SELECT;
-import static com.nofatclips.androidtesting.model.InteractionType.LOCATION_CHANGE_EVENT;
 import static com.nofatclips.androidtesting.model.InteractionType.LONG_CLICK;
 import static com.nofatclips.androidtesting.model.InteractionType.MAGNETIC_FIELD_SENSOR_EVENT;
 import static com.nofatclips.androidtesting.model.InteractionType.OPEN_MENU;
@@ -30,9 +31,9 @@ import static com.nofatclips.crawler.Resources.PRECRAWLING;
 import static com.nofatclips.crawler.Resources.SLEEP_AFTER_EVENT;
 import static com.nofatclips.crawler.Resources.SLEEP_AFTER_RESTART;
 import static com.nofatclips.crawler.Resources.SLEEP_ON_THROBBER;
+import static com.nofatclips.crawler.Resources.TEST_LOCATION_PROVIDER;
 import static com.nofatclips.crawler.Resources.USE_GPS;
 import static com.nofatclips.crawler.Resources.USE_SENSORS;
-import static com.nofatclips.crawler.Resources.TEST_LOCATION_PROVIDER;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -275,8 +276,10 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 					) {
 				fireSensorEvent(value, interactionType);
 				
-		} else if ( interactionType.equals(LOCATION_CHANGE_EVENT) ) {
-			fireLocationChangeEvent(value);
+		} else if ( interactionType.equals(GPS_LOCATION_CHANGE_EVENT) ) {
+			fireGPSLocationChangeEvent(value);
+		} else if ( interactionType.equals(GPS_PROVIDER_DISABLE_EVENT) ) {
+			
 			/** @author nicola amatucci */
 		} else {
 			
@@ -305,8 +308,12 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 		}
 	}
 	
-	private void fireLocationChangeEvent(String value)
+	private void fireGPSLocationChangeEvent(String value)
 	{
+		//abilita il provider se disabilitato
+		if ( locationManager.isProviderEnabled( TEST_LOCATION_PROVIDER ) == false )
+			locationManager.setTestProviderEnabled(TEST_LOCATION_PROVIDER, true);
+		
 		if (value != null)
 		{
 			String[] stringValues = value.split("\\|");
@@ -326,6 +333,15 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 			}
 		}
 	}
+	
+	/*
+	private void disableGPSLocationProvider()
+	{
+		//disabilita il provider
+		if ( locationManager.isProviderEnabled( TEST_LOCATION_PROVIDER ) == true )
+			locationManager.setTestProviderEnabled(TEST_LOCATION_PROVIDER, false);
+	}
+	*/
 	/** @author nicola amatucci */
 	
 	// Scroll the view to the top. Only works for ListView and ScrollView. Support for GridView and others must be added
