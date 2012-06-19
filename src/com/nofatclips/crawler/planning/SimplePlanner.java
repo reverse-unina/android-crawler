@@ -9,7 +9,8 @@ import static com.nofatclips.androidtesting.model.InteractionType.OPEN_MENU;
 import static com.nofatclips.androidtesting.model.InteractionType.ORIENTATION_SENSOR_EVENT;
 import static com.nofatclips.androidtesting.model.InteractionType.SCROLL_DOWN;
 import static com.nofatclips.androidtesting.model.InteractionType.TEMPERATURE_SENSOR_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.GPS_PROVIDER_DISABLE_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.INCOMING_CALL_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.INCOMING_SMS_EVENT;
 import static com.nofatclips.crawler.Resources.BACK_BUTTON_EVENT;
 import static com.nofatclips.crawler.Resources.EXCLUDE_WIDGETS_INPUTS_IN_SENSORS_EVENTS;
 import static com.nofatclips.crawler.Resources.MENU_EVENTS;
@@ -32,6 +33,7 @@ import com.nofatclips.androidtesting.model.Transition;
 import com.nofatclips.androidtesting.model.UserEvent;
 import com.nofatclips.androidtesting.model.UserInput;
 import com.nofatclips.androidtesting.model.WidgetState;
+import com.nofatclips.crawler.Resources;
 import com.nofatclips.crawler.model.Abstractor;
 import com.nofatclips.crawler.model.EventHandler;
 import com.nofatclips.crawler.model.Filter;
@@ -183,6 +185,8 @@ public class SimplePlanner implements Planner {
 				evt.setValue(sensorInputValueStr);
 				t = getAbstractor().createStep(a, inputs, evt);
 				p.addTask(t);
+				
+				//TODO: aggiungere altri valori random, +++, ---, 000, out-of-bounds
 			}	
 		}
 		
@@ -242,6 +246,22 @@ public class SimplePlanner implements Planner {
 			//evt = getAbstractor().createEvent(null, GPS_PROVIDER_DISABLE_EVENT);
 			//t = getAbstractor().createStep(a, inputs, evt);
 			//p.addTask(t);
+		}
+		
+		if (Resources.SIMULATE_INCOMING_CALL)
+		{
+			evt = null;
+			evt = getAbstractor().createEvent(null, INCOMING_CALL_EVENT);
+			t = getAbstractor().createStep(a, new ArrayList<UserInput>(), evt);
+			p.addTask(t);
+		}
+		
+		if (Resources.SIMULATE_INCOMING_SMS)
+		{
+			evt = null;
+			evt = getAbstractor().createEvent(null, INCOMING_SMS_EVENT);
+			t = getAbstractor().createStep(a, new ArrayList<UserInput>(), evt);
+			p.addTask(t);
 		}
 		/** @author nicola amatucci */
 		

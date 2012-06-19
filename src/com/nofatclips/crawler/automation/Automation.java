@@ -5,6 +5,8 @@ import static android.view.Surface.ROTATION_0;
 import static android.view.Surface.ROTATION_180;
 import static com.nofatclips.androidtesting.model.InteractionType.ACCELEROMETER_SENSOR_EVENT;
 import static com.nofatclips.androidtesting.model.InteractionType.AMBIENT_TEMPERATURE_SENSOR_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.INCOMING_CALL_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.INCOMING_SMS_EVENT;
 import static com.nofatclips.androidtesting.model.InteractionType.BACK;
 import static com.nofatclips.androidtesting.model.InteractionType.CHANGE_ORIENTATION;
 import static com.nofatclips.androidtesting.model.InteractionType.CLICK;
@@ -32,7 +34,6 @@ import static com.nofatclips.crawler.Resources.SLEEP_AFTER_EVENT;
 import static com.nofatclips.crawler.Resources.SLEEP_AFTER_RESTART;
 import static com.nofatclips.crawler.Resources.SLEEP_ON_THROBBER;
 import static com.nofatclips.crawler.Resources.TEST_LOCATION_PROVIDER;
-import static com.nofatclips.crawler.Resources.USE_GPS;
 import it.unina.android.hardware.mock.MockSensorEvent;
 import it.unina.android.hardware.mock.MockSensorEventFactory;
 import it.unina.android.hardware.mock.MockSensorManager;
@@ -69,6 +70,7 @@ import com.nofatclips.androidtesting.model.UserEvent;
 import com.nofatclips.androidtesting.model.UserInput;
 import com.nofatclips.crawler.automation.sensors_utils.ActivityReflectorCache;
 import com.nofatclips.crawler.automation.sensors_utils.ActivityReflectorCacheElement;
+import com.nofatclips.crawler.automation.sensors_utils.AndroidConsoleSocket;
 import com.nofatclips.crawler.model.ActivityDescription;
 import com.nofatclips.crawler.model.Extractor;
 import com.nofatclips.crawler.model.ImageCaptor;
@@ -284,6 +286,12 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 			fireGPSLocationChangeEvent(value);
 		} else if ( interactionType.equals(GPS_PROVIDER_DISABLE_EVENT) ) {
 			toggleGPSLocationProvider();
+		} else if ( interactionType.equals(INCOMING_CALL_EVENT) ) {
+			AndroidConsoleSocket.callNumber("1234");
+			try { Thread.sleep(2000); } catch(Exception ex) { }
+			AndroidConsoleSocket.hangUp("1234");
+		} else if ( interactionType.equals(INCOMING_SMS_EVENT) ) {
+			AndroidConsoleSocket.sendSMS("1234", "THIS IS A TEST");
 /** @author nicola amatucci */
 		} else {
 			
