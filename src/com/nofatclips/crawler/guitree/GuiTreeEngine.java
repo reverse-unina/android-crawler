@@ -17,9 +17,12 @@ import static com.nofatclips.crawler.Resources.PAUSE_AFTER_TRACES;
 import static com.nofatclips.crawler.Resources.SLEEP_AFTER_EVENT;
 import static com.nofatclips.crawler.Resources.SLEEP_AFTER_RESTART;
 import static com.nofatclips.crawler.Resources.SLEEP_ON_THROBBER;
+import static com.nofatclips.crawler.Resources.TEST_LOCATION_PROVIDER;
 import static com.nofatclips.crawler.Resources.TRACE_MAX_DEPTH;
 import static com.nofatclips.crawler.Resources.USE_GPS;
-import static com.nofatclips.crawler.Resources.TEST_LOCATION_PROVIDER;
+import static com.nofatclips.crawler.Resources.USE_SENSORS;
+
+import it.unina.android.hardware.SensorManager;
 
 import java.util.GregorianCalendar;
 
@@ -104,27 +107,14 @@ public class GuiTreeEngine extends Engine {
 		
 	}
 	
-	protected void setUp () {
-		try {
-			super.setUp();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		theRestarter.setRestartPoint(theAutomation.getActivity());
-		theGuiTree.setAppName(theAutomation.getAppName());
-		theGuiTree.setSleepAfterEvent(SLEEP_AFTER_EVENT);
-		theGuiTree.setSleepAfterRestart(SLEEP_AFTER_RESTART);
-		theGuiTree.setSleepOnThrobber(SLEEP_ON_THROBBER);
-		theGuiTree.setClassName(CLASS_NAME);
-		theGuiTree.setPackageName(PACKAGE_NAME);
-		theGuiTree.setComparationWidgets(COMPARATOR.describe());
-		theGuiTree.setInAndOutFocus(IN_AND_OUT_FOCUS);
-		if (!ACTIVITY_DESCRIPTION_IN_SESSION) {
-			theGuiTree.setStateFileName(ACTIVITY_LIST_FILE_NAME);
+	protected void setUp ()
+	{
+		/** @author nicola amatucci */
+		if (USE_SENSORS)
+		{
+			SensorManager.TESTING = true;
 		}
 		
-		/** @author nicola amatucci */
 		if (USE_GPS)
 		{
 			//attivo il LocationManager e il provider di test
@@ -142,9 +132,29 @@ public class GuiTreeEngine extends Engine {
 			 * 					int accuracy)
 			 */
 			theAutomation.locationManager.addTestProvider(TEST_LOCATION_PROVIDER, false, false, false, false, true, true, true, 0, 5);
-			theAutomation.locationManager.setTestProviderEnabled(TEST_LOCATION_PROVIDER, false);
+			theAutomation.locationManager.setTestProviderEnabled(TEST_LOCATION_PROVIDER, true);
 		}
 		/** @author nicola amatucci */
+
+		
+		try {
+			super.setUp();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		theRestarter.setRestartPoint(theAutomation.getActivity());
+		theGuiTree.setAppName(theAutomation.getAppName());
+		theGuiTree.setSleepAfterEvent(SLEEP_AFTER_EVENT);
+		theGuiTree.setSleepAfterRestart(SLEEP_AFTER_RESTART);
+		theGuiTree.setSleepOnThrobber(SLEEP_ON_THROBBER);
+		theGuiTree.setClassName(CLASS_NAME);
+		theGuiTree.setPackageName(PACKAGE_NAME);
+		theGuiTree.setComparationWidgets(COMPARATOR.describe());
+		theGuiTree.setInAndOutFocus(IN_AND_OUT_FOCUS);
+		if (!ACTIVITY_DESCRIPTION_IN_SESSION) {
+			theGuiTree.setStateFileName(ACTIVITY_LIST_FILE_NAME);
+		}		
 	}
 	
 	
@@ -152,7 +162,9 @@ public class GuiTreeEngine extends Engine {
 	@Override
 	protected void tearDown() throws Exception
 	{
-		theAutomation.locationManager.removeTestProvider(TEST_LOCATION_PROVIDER);
+		if (theAutomation != null && theAutomation.locationManager != null)
+			theAutomation.locationManager.removeTestProvider(TEST_LOCATION_PROVIDER);
+		
 		super.tearDown();
 	}
 	/** @author nicola amatucci */

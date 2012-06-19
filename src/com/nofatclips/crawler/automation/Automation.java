@@ -33,7 +33,9 @@ import static com.nofatclips.crawler.Resources.SLEEP_AFTER_RESTART;
 import static com.nofatclips.crawler.Resources.SLEEP_ON_THROBBER;
 import static com.nofatclips.crawler.Resources.TEST_LOCATION_PROVIDER;
 import static com.nofatclips.crawler.Resources.USE_GPS;
-import static com.nofatclips.crawler.Resources.USE_SENSORS;
+import it.unina.android.hardware.mock.MockSensorEvent;
+import it.unina.android.hardware.mock.MockSensorEventFactory;
+import it.unina.android.hardware.mock.MockSensorManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,6 +67,8 @@ import com.nofatclips.androidtesting.model.Trace;
 import com.nofatclips.androidtesting.model.Transition;
 import com.nofatclips.androidtesting.model.UserEvent;
 import com.nofatclips.androidtesting.model.UserInput;
+import com.nofatclips.crawler.automation.sensors_utils.ActivityReflectorCache;
+import com.nofatclips.crawler.automation.sensors_utils.ActivityReflectorCacheElement;
 import com.nofatclips.crawler.model.ActivityDescription;
 import com.nofatclips.crawler.model.Extractor;
 import com.nofatclips.crawler.model.ImageCaptor;
@@ -94,7 +98,7 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 		
 	/** @author nicola amatucci */
 	//settati da GuiTreeEngine.setUp()
-	public LocationManager locationManager;
+	public LocationManager locationManager;	
 	/** @author nicola amatucci */
 	
 	// A Trivial Extractor is provided if none is assigned
@@ -266,7 +270,7 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 		} else if (interactionType.equals(SET_BAR)) {
 			solo.setProgressBar((ProgressBar)v, Integer.parseInt(value));		
 			
-			/** @author nicola amatucci */
+/** @author nicola amatucci */
 		} else  if (
 					interactionType.equals(ORIENTATION_SENSOR_EVENT) ||
 					interactionType.equals(ACCELEROMETER_SENSOR_EVENT) ||
@@ -279,8 +283,8 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 		} else if ( interactionType.equals(GPS_LOCATION_CHANGE_EVENT) ) {
 			fireGPSLocationChangeEvent(value);
 		} else if ( interactionType.equals(GPS_PROVIDER_DISABLE_EVENT) ) {
-			
-			/** @author nicola amatucci */
+			toggleGPSLocationProvider();
+/** @author nicola amatucci */
 		} else {
 			
 			
@@ -302,8 +306,15 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 				floatValues[1] = Float.parseFloat(stringValues[1]);
 				floatValues[2] = Float.parseFloat(stringValues[2]);
 				
+				MockSensorEvent event = null;
 				
-				
+				if (interactionType.equals(ORIENTATION_SENSOR_EVENT)) event = MockSensorEventFactory.buildOrientationEvent(floatValues);
+				if (interactionType.equals(ACCELEROMETER_SENSOR_EVENT)) event = MockSensorEventFactory.buildAccelerometerEvent(floatValues);
+				if (interactionType.equals(MAGNETIC_FIELD_SENSOR_EVENT)) event = MockSensorEventFactory.buildMagneticFieldEvent(floatValues);
+				if (interactionType.equals(TEMPERATURE_SENSOR_EVENT)) event = MockSensorEventFactory.buildTemperatureEvent(floatValues);
+				if (interactionType.equals(AMBIENT_TEMPERATURE_SENSOR_EVENT)) event = MockSensorEventFactory.buildAmbientTemperatureEvent(floatValues);
+								
+				MockSensorManager.getInstance().riseSensorEvent(event);
 			}
 		}
 	}
@@ -334,14 +345,22 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 		}
 	}
 	
-	/*
-	private void disableGPSLocationProvider()
+	private void toggleGPSLocationProvider()
 	{
 		//disabilita il provider
 		if ( locationManager.isProviderEnabled( TEST_LOCATION_PROVIDER ) == true )
+		{
+			//disabilita il gps
 			locationManager.setTestProviderEnabled(TEST_LOCATION_PROVIDER, false);
+			
+			//pausa di un secondo
+			//try { Thread.sleep(1000); } catch (InterruptedException e) { }
+			
+			//abilita il gps
+			//locationManager.setTestProviderEnabled(TEST_LOCATION_PROVIDER, true);
+		}
 	}
-	*/
+	
 	/** @author nicola amatucci */
 	
 	// Scroll the view to the top. Only works for ListView and ScrollView. Support for GridView and others must be added
@@ -737,6 +756,10 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 	// a description of the Activity, which is basically the name and a list of widgets
 	// in the Activity.
 	
+	/** @author nicola amatucci */
+	ActivityReflectorCache activityCache = new ActivityReflectorCache();
+	/** @author nicola amatucci */
+	
 	public class TrivialExtractor implements Extractor, ImageCaptor {
 
 		public void extractState() {
@@ -778,21 +801,42 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 				/** @author nicola amatucci */
 				public boolean usesSensorsManager()
 				{
-					//it.unina.android.hardware.SensorEventListener
-					//android.hardware.SensorEventListener
-					//TODO: cambiare a seconda delle decisioni prese
-					if (USE_SENSORS)
-						return com.nofatclips.crawler.automation.sensors_utils.ReflectorHelper.scanClassForInterface(getActivity().getClass(), "android.hardware.SensorEventListener");
+					if (com.nofatclips.crawler.Resources.USE_SENSORS)
+					{
+						ActivityReflectorCacheElement a = activityCache.get( getActivity().getTitle().toString() );
+						
+						if (a == null || a.usesSensors == null)
+						{
+							a = new ActivityReflectorCacheElement();
+							a.usesSensors = com.nofatclips.crawler.automation.sensors_utils.ReflectorHelper.scanClassForInterface(getActivity().getClass(), "it.unina.android.hardware.SensorEventListener");
+							activityCache.put( getActivity().getTitle().toString(), a );
+						}
+						return a.usesSensors;
+					}
 					else
+					{
 						return false;
+					}
 				}
 				
 				public boolean usesLocationManager()
 				{
-					if (USE_GPS)
-						return com.nofatclips.crawler.automation.sensors_utils.ReflectorHelper.scanClassForInterface(getActivity().getClass(), "android.location.LocationListener");
+					if (com.nofatclips.crawler.Resources.USE_GPS)
+					{
+						ActivityReflectorCacheElement a = activityCache.get( getActivity().getTitle() );
+						
+						if (a == null || a.usesLocation == null)
+						{						
+							a = new ActivityReflectorCacheElement();
+							a.usesLocation = com.nofatclips.crawler.automation.sensors_utils.ReflectorHelper.scanClassForInterface(getActivity().getClass(), "android.location.LocationListener");
+							activityCache.put( getActivity().getTitle().toString(), a );
+						}						
+						return a.usesLocation;
+					}
 					else
+					{
 						return false;
+					}
 				}
 				/** @author nicola amatucci */
 

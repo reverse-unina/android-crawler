@@ -82,8 +82,10 @@ public class ReflectorHelper
 	{
 		//controllo se la classe implementa lei stessa l'interfaccia 
 		if ( ReflectorHelper.implementsInterface(myClass, interfaceName))
+		{
+			Log.v("ReflectorHelper", "Found interface : " + interfaceName + " in " + myClass.getCanonicalName());
 			return true;
-		
+		}
 		//controllo se un campo implementa l'interfaccia
 		for(Field field : myClass.getDeclaredFields() )
 		{
@@ -91,13 +93,20 @@ public class ReflectorHelper
 								
 			//controlla se implementa l'interfaccia
 			if ( ReflectorHelper.implementsInterface(fieldClass, interfaceName))
+			{
+				Log.v("ReflectorHelper", "Found field implements : " + interfaceName  + " in " + fieldClass.getCanonicalName());
 				return true;
+			}
 			
 			//controlla se e' una definizione inline
 			if (fieldClass.getCanonicalName().equals(interfaceName))
+			{
+				Log.v("ReflectorHelper", "Found field inline definition : " + interfaceName  + " in " + fieldClass.getCanonicalName());
 				return true;
+			}
 		}
 		
+		Log.v("ReflectorHelper", "Not found : " + interfaceName  + " in " + myClass.getCanonicalName());
 		return false;
 	}
 }
