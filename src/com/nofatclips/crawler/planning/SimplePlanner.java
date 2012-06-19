@@ -117,7 +117,10 @@ public class SimplePlanner implements Planner {
 			evt = null;
 			for (Integer type : SENSOR_TYPES)
 			{	
-				float[] sensorInputValues = null;					
+				float[] randomInputValues = null;					
+				float[] positiveRandomInputValues = null;
+				float[] negativeRandomInputValues = null;				
+				
 				String sensorInteractionType = null;
 				
 				switch(type)
@@ -125,28 +128,64 @@ public class SimplePlanner implements Planner {
 					case android.hardware.Sensor.TYPE_ACCELEROMETER: {
 						Log.i("nofatclips", "Creating trace for accelerometer");
 						sensorInteractionType = ACCELEROMETER_SENSOR_EVENT;
-						sensorInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateAccelerometerValues();							
+						randomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateAccelerometerValues();
+						
+						positiveRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateAccelerometerValues();
+						for (int i = 0; i < 3; i++)
+							positiveRandomInputValues[i] = Math.abs(positiveRandomInputValues[0]);
+						
+						negativeRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateAccelerometerValues();
+						for (int i = 0; i < 3; i++)
+							negativeRandomInputValues[i] = -1 * Math.abs(positiveRandomInputValues[0]);
+						
 						break;
 					}
 					
 					case android.hardware.Sensor.TYPE_ORIENTATION: {
 						Log.i("nofatclips", "Creating trace for orientation");
 						sensorInteractionType = ORIENTATION_SENSOR_EVENT;
-						sensorInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateOrientationValues();
+						randomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateOrientationValues();
+						
+						positiveRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateOrientationValues();
+						for (int i = 0; i < 3; i++)
+							positiveRandomInputValues[i] = Math.abs(positiveRandomInputValues[0]);
+						
+						negativeRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateOrientationValues();
+						for (int i = 0; i < 3; i++)
+							negativeRandomInputValues[i] = -1 * Math.abs(positiveRandomInputValues[0]);
+						
 						break;
 					}
 					
 					case android.hardware.Sensor.TYPE_MAGNETIC_FIELD: {
 						Log.i("nofatclips", "Creating trace for magnetic field");
 						sensorInteractionType = MAGNETIC_FIELD_SENSOR_EVENT;
-						sensorInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateMagneticFieldValues();
+						randomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateMagneticFieldValues();
+						
+						positiveRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateMagneticFieldValues();
+						for (int i = 0; i < 3; i++)
+							positiveRandomInputValues[i] = Math.abs(positiveRandomInputValues[0]);
+						
+						negativeRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateMagneticFieldValues();
+						for (int i = 0; i < 3; i++)
+							negativeRandomInputValues[i] = -1 * Math.abs(positiveRandomInputValues[0]);
+						
 						break;
 					}
 					
 					case android.hardware.Sensor.TYPE_TEMPERATURE: {
 						Log.i("nofatclips", "Creating trace for temperature");
 						sensorInteractionType = TEMPERATURE_SENSOR_EVENT;
-						sensorInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateTemperatureValues();
+						randomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateTemperatureValues();
+						
+						positiveRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateTemperatureValues();
+						for (int i = 0; i < 3; i++)
+							positiveRandomInputValues[i] = Math.abs(positiveRandomInputValues[0]);
+						
+						negativeRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateTemperatureValues();
+						for (int i = 0; i < 3; i++)
+							negativeRandomInputValues[i] = -1 * Math.abs(positiveRandomInputValues[0]);
+						
 						break;
 					}						
 
@@ -156,6 +195,9 @@ public class SimplePlanner implements Planner {
 						Log.i("nofatclips", "Creating trace for temperature");
 						sensorInteractionType = AMBIENT_TEMPERATURE_SENSOR_EVENT;
 						sensorInputValues = it.unina.android.utils.SensorValuesGenerator.generateAmbientTemperatureValues();
+						
+						//...
+						
 						break;
 					}
 					
@@ -178,15 +220,39 @@ public class SimplePlanner implements Planner {
 						}
 					}
 				}
-
+				
 				//creo l'evento relativo al sensore
-				String sensorInputValueStr = sensorInputValues[0] + "|" + sensorInputValues[1] + "|" + sensorInputValues[2];
+				String sensorInputValueStr;
+				
+				//random
+				sensorInputValueStr = randomInputValues[0] + "|" + randomInputValues[1] + "|" + randomInputValues[2];
 				evt = getAbstractor().createEvent(null, sensorInteractionType);
 				evt.setValue(sensorInputValueStr);
 				t = getAbstractor().createStep(a, inputs, evt);
 				p.addTask(t);
 				
-				//TODO: aggiungere altri valori random, +++, ---, 000, out-of-bounds
+				//+ + +
+				sensorInputValueStr = positiveRandomInputValues[0] + "|" + positiveRandomInputValues[1] + "|" + positiveRandomInputValues[2];
+				evt = getAbstractor().createEvent(null, sensorInteractionType);
+				evt.setValue(sensorInputValueStr);
+				t = getAbstractor().createStep(a, inputs, evt);
+				p.addTask(t);
+				
+				//- - -
+				sensorInputValueStr = negativeRandomInputValues[0] + "|" + negativeRandomInputValues[1] + "|" + negativeRandomInputValues[2];
+				evt = getAbstractor().createEvent(null, sensorInteractionType);
+				evt.setValue(sensorInputValueStr);
+				t = getAbstractor().createStep(a, inputs, evt);
+				p.addTask(t);				
+
+				//0 0 0
+				sensorInputValueStr = "0|0|0";
+				evt = getAbstractor().createEvent(null, sensorInteractionType);
+				evt.setValue(sensorInputValueStr);
+				t = getAbstractor().createStep(a, inputs, evt);
+				p.addTask(t);				
+				
+				//TODO: out-of-bounds?
 			}	
 		}
 		
