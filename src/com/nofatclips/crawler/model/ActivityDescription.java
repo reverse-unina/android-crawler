@@ -8,8 +8,8 @@ public interface ActivityDescription extends Iterable<View> {
 	public String getActivityTitle();
 	public int getWidgetIndex (View v);
 
-	/** @author nicola amatucci */
+/** @author nicola amatucci */
 	public boolean usesSensorsManager();
 	public boolean usesLocationManager();
-	/** @author nicola amatucci */
+/** @author nicola amatucci */
 }

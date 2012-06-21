@@ -21,17 +21,16 @@ import static com.nofatclips.crawler.Resources.COMPARE_LIST_COUNT;
 public class CustomWidgetsComparator extends NameComparator {
 	
 	public final static boolean IGNORE_ACTIVITY_NAME = true;
-	private boolean byName = true;
+//	private boolean byName = true;
 	protected String[] widgetClasses;
 	
 	public CustomWidgetsComparator (String... widgets) {
-		super ();
-		this.widgetClasses = widgets; 
+		this (false, widgets);
 	}
 	
 	public CustomWidgetsComparator (boolean ignore, String... widgets) {
-		this(widgets);
-		this.byName = !ignore;
+		super (!ignore);
+		this.widgetClasses = widgets; 
 	}
 	
 	public boolean matchClass (String type) {

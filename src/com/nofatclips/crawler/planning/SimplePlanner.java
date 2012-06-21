@@ -1,26 +1,5 @@
 package com.nofatclips.crawler.planning;
 
-import static com.nofatclips.androidtesting.model.InteractionType.ACCELEROMETER_SENSOR_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.BACK;
-import static com.nofatclips.androidtesting.model.InteractionType.CHANGE_ORIENTATION;
-import static com.nofatclips.androidtesting.model.InteractionType.GPS_LOCATION_CHANGE_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.MAGNETIC_FIELD_SENSOR_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.OPEN_MENU;
-import static com.nofatclips.androidtesting.model.InteractionType.ORIENTATION_SENSOR_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.SCROLL_DOWN;
-import static com.nofatclips.androidtesting.model.InteractionType.TEMPERATURE_SENSOR_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.INCOMING_CALL_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.INCOMING_SMS_EVENT;
-import static com.nofatclips.crawler.Resources.BACK_BUTTON_EVENT;
-import static com.nofatclips.crawler.Resources.EXCLUDE_WIDGETS_INPUTS_IN_SENSORS_EVENTS;
-import static com.nofatclips.crawler.Resources.MENU_EVENTS;
-import static com.nofatclips.crawler.Resources.ORIENTATION_EVENTS;
-import static com.nofatclips.crawler.Resources.SCROLL_DOWN_EVENT;
-import static com.nofatclips.crawler.Resources.SENSOR_TYPES;
-import static com.nofatclips.crawler.Resources.TAB_EVENTS_START_ONLY;
-import static com.nofatclips.crawler.Resources.USE_GPS;
-import static com.nofatclips.crawler.Resources.USE_SENSORS;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,19 +7,12 @@ import java.util.List;
 
 import android.util.Log;
 
-import com.nofatclips.androidtesting.model.ActivityState;
-import com.nofatclips.androidtesting.model.Transition;
-import com.nofatclips.androidtesting.model.UserEvent;
-import com.nofatclips.androidtesting.model.UserInput;
-import com.nofatclips.androidtesting.model.WidgetState;
-import com.nofatclips.crawler.Resources;
-import com.nofatclips.crawler.model.Abstractor;
-import com.nofatclips.crawler.model.EventHandler;
-import com.nofatclips.crawler.model.Filter;
-import com.nofatclips.crawler.model.InputHandler;
-import com.nofatclips.crawler.model.Plan;
-import com.nofatclips.crawler.model.Planner;
+import com.nofatclips.androidtesting.model.*;
+import com.nofatclips.crawler.model.*;
 import com.nofatclips.crawler.planning.sensors_utils.GpsValuesGenerator;
+
+import static com.nofatclips.crawler.Resources.*;
+import static com.nofatclips.androidtesting.model.InteractionType.*;
 //import static com.nofatclips.androidtesting.model.SimpleType.*;
 
 public class SimplePlanner implements Planner {
@@ -62,7 +34,7 @@ public class SimplePlanner implements Planner {
 		Plan p = new Plan();
 		Log.i("nofatclips", "Planning for new Activity " + a.getName());
 		for (WidgetState w: getEventFilter()) {
-			Collection<UserEvent> events = getUser().handleEvent(w);
+			Collection<UserEvent> events = getUser().handleEvent(w);			
 			for (UserEvent evt: events) {
 				if (evt == null) continue;
 				Collection<UserInput> inputs = new ArrayList<UserInput>();
@@ -110,8 +82,19 @@ public class SimplePlanner implements Planner {
 			Log.i("nofatclips", "Created trace to change orientation");
 			p.addTask(t);
 		}
+		
+		if (KEY_EVENTS.length>0) {
+			for (int keyCode: KEY_EVENTS) {
+				evt = getAbstractor().createEvent(null, PRESS_KEY);
+				evt.setValue(String.valueOf(keyCode));
+				t = getAbstractor().createStep(a, new HashSet<UserInput>(), evt);
+				Log.i("nofatclips", "Created trace to perform key press (key code: " + keyCode + ")");
+				p.addTask(t);
+			}
+		}
 
-		/** @author nicola amatucci */
+		
+/** @author nicola amatucci */
 		if (USE_SENSORS && a.getUsesSensorsManager())
 		{
 			evt = null;
@@ -314,7 +297,7 @@ public class SimplePlanner implements Planner {
 			//p.addTask(t);
 		}
 		
-		if (Resources.SIMULATE_INCOMING_CALL)
+		if (SIMULATE_INCOMING_CALL)
 		{
 			evt = null;
 			evt = getAbstractor().createEvent(null, INCOMING_CALL_EVENT);
@@ -322,14 +305,14 @@ public class SimplePlanner implements Planner {
 			p.addTask(t);
 		}
 		
-		if (Resources.SIMULATE_INCOMING_SMS)
+		if (SIMULATE_INCOMING_SMS)
 		{
 			evt = null;
 			evt = getAbstractor().createEvent(null, INCOMING_SMS_EVENT);
 			t = getAbstractor().createStep(a, new ArrayList<UserInput>(), evt);
 			p.addTask(t);
 		}
-		/** @author nicola amatucci */
+/** @author nicola amatucci */		
 		
 		return p;
 	}

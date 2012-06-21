@@ -37,12 +37,14 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 	private int eventId=0;
 	private int inputId=0;
 	private int activityId=0;
+	private int widgetId=0;
 	private TypeDetector detector;
 	private List<AbstractorListener> theListeners = new ArrayList<AbstractorListener>();
 	public final static String ACTOR_NAME = "GuiTreeAbstractor";
 	private static final String EVENT_PARAM_NAME = "eventId";
 	private static final String INPUT_PARAM_NAME = "inputId";
 	private static final String ACTIVITY_PARAM_NAME = "activityId";
+	private static final String WIDGET_PARAM_NAME = "widgetId";
 
 	public GuiTreeAbstractor () throws ParserConfigurationException {
 		this (new GuiTree());
@@ -97,36 +99,69 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 		return updateDescription  (newActivity, desc, true);
 	}
 
+	public TestCaseWidget createWidget (View v) {
+		TestCaseWidget w = TestCaseWidget.createWidget(getTheSession());
+		String id = String.valueOf(v.getId());
+		String text = "";
+		String name = "";
+		int type = 0;
+		if (v instanceof TextView) {
+			TextView t = (TextView)v;
+			type = t.getInputType();
+			text = t.getText().toString();
+			name = text;
+			if (v instanceof EditText) {
+				CharSequence hint = ((EditText)v).getHint();
+				name = (hint==null)?"":hint.toString();
+			}
+		}
+		w.setIdNameType(id, name, v.getClass().getName());
+		w.setUniqueId(getUniqueWidgetId());
+		if (type!=0) {
+			w.setTextType("" + type);
+		}
+		w.setSimpleType(getTypeDetector().getSimpleType(v));
+		setCount (v,w);
+		setValue (v,w);
+		w.setAvailable((v.isEnabled())?"true":"false");
+		w.setClickable((v.isClickable())?"true":"false");
+		w.setLongClickable((v.isLongClickable())?"true":"false");
+//		w.setIndex(desc.getWidgetIndex(v));
+		return w;
+	}
+	
 	public boolean updateDescription (ActivityState newActivity, ActivityDescription desc, boolean detectDuplicates) {
 		boolean hasDescription = false;
 		for (View v: desc) {
 			hasDescription = true;
 			if (!v.isShown()) continue;
-			TestCaseWidget w = TestCaseWidget.createWidget(getTheSession());
-			String id = String.valueOf(v.getId());
-			String text = "";
-			String name = "";
-			int type = 0;
-			if (v instanceof TextView) {
-				TextView t = (TextView)v;
-				type = t.getInputType();
-				text = t.getText().toString();
-				name = text;
-				if (v instanceof EditText) {
-					CharSequence hint = ((EditText)v).getHint();
-					name = (hint==null)?"":hint.toString();
-				}
-			}
-			w.setIdNameType(id, name, v.getClass().getName());
-			if (type!=0) {
-				w.setTextType("" + type);
-			}
-			w.setSimpleType(getTypeDetector().getSimpleType(v));
-			setCount (v,w);
-			setValue (v,w);
-			w.setAvailable((v.isEnabled())?"true":"false");
-			w.setClickable((v.isClickable())?"true":"false");
-			w.setLongClickable((v.isLongClickable())?"true":"false");
+			TestCaseWidget w = createWidget (v);
+//			TestCaseWidget w = TestCaseWidget.createWidget(getTheSession());
+//			String id = String.valueOf(v.getId());
+//			String text = "";
+//			String name = "";
+//			int type = 0;
+//			if (v instanceof TextView) {
+//				TextView t = (TextView)v;
+//				type = t.getInputType();
+//				text = t.getText().toString();
+//				name = text;
+//				if (v instanceof EditText) {
+//					CharSequence hint = ((EditText)v).getHint();
+//					name = (hint==null)?"":hint.toString();
+//				}
+//			}
+//			w.setIdNameType(id, name, v.getClass().getName());
+//			w.setUniqueId(getUniqueWidgetId());
+//			if (type!=0) {
+//				w.setTextType("" + type);
+//			}
+//			w.setSimpleType(getTypeDetector().getSimpleType(v));
+//			setCount (v,w);
+//			setValue (v,w);
+//			w.setAvailable((v.isEnabled())?"true":"false");
+//			w.setClickable((v.isClickable())?"true":"false");
+//			w.setLongClickable((v.isLongClickable())?"true":"false");
 			w.setIndex(desc.getWidgetIndex(v));
 			if (detectDuplicates && newActivity.hasWidget(w)) continue;
 			newActivity.addWidget(w);
@@ -135,18 +170,17 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 			}
 		}
 		
-		/** @author nicola amatucci */
-		//sensors
+/** @author nicola amatucci */
 		newActivity.setUsesSensorsManager(desc.usesSensorsManager());
 		newActivity.setUsesLocationManager(desc.usesLocationManager());
-		/** @author nicola amatucci */
+/** @author nicola amatucci */
 
 		return hasDescription;
 	}
 	
 	@SuppressWarnings("rawtypes")
 	private void setCount (View v, WidgetState w) {
-		// For lists, the count is set to the number of rows in the list (inactive rows count as well)
+		// For lists, the count is set to the number of rows in the list (inactive rows - e.g. separators - count as well)
 		if (v instanceof AdapterView) {
 			w.setCount(((AdapterView)v).getCount());
 			return;
@@ -237,6 +271,7 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 			target.setType("null");
 			target.setId("-1");
 			target.setSimpleType("null");
+			target.setUniqueId("w0");
 			newEvent.setWidget (target);
 		} else {
 			newEvent.setWidget (target.clone());
@@ -249,10 +284,10 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 		return newEvent;
 	}
 
-	public UserInput createInput(WidgetState target, String text, String type) {
+	public UserInput createInput(WidgetState target, String value, String type) {
 		TestCaseInput newInput = TestCaseInput.createInput(getTheSession());
-		newInput.setWidget(target);
-		newInput.setValue(text);
+		newInput.setWidget (target.clone());
+		newInput.setValue(value);
 		newInput.setType(type);
 		newInput.setId(getUniqueInputId());
 		for (AbstractorListener listener: this.theListeners) {
@@ -260,6 +295,18 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 		}
 		return newInput;
 	}
+
+//	public UserInput createInput(WidgetState target, String text, String type) {
+//		TestCaseInput newInput = TestCaseInput.createInput(getTheSession());
+//		newInput.setWidget(target);
+//		newInput.setValue(text);
+//		newInput.setType(type);
+//		newInput.setId(getUniqueInputId());
+//		for (AbstractorListener listener: this.theListeners) {
+//			listener.onNewInput(newInput);
+//		}
+//		return newInput;
+//	}
 
 	public Trace createTrace(Trace head, Transition tail) {
 		TestCaseTrace t;
@@ -323,11 +370,18 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 		return "i" + ret;
 	}
 
+	public String getUniqueWidgetId () {
+		int ret = this.widgetId;
+		this.widgetId++;
+		return "w" + ret;
+	}
+
 	public SessionParams onSavingState() {
 		SessionParams state = new SessionParams();
 		state.store(EVENT_PARAM_NAME, String.valueOf(this.eventId));
 		state.store(INPUT_PARAM_NAME, String.valueOf(this.inputId));
 		state.store(ACTIVITY_PARAM_NAME, String.valueOf(this.activityId));
+		state.store(WIDGET_PARAM_NAME, String.valueOf(this.widgetId));
 		return state;
 	}
 	
@@ -335,6 +389,7 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 		this.eventId = sessionParams.getInt(EVENT_PARAM_NAME);
 		this.inputId = sessionParams.getInt(INPUT_PARAM_NAME);
 		this.activityId = sessionParams.getInt(ACTIVITY_PARAM_NAME);
+		this.widgetId = sessionParams.getInt(WIDGET_PARAM_NAME);
 		Log.d("nofatclips", "Restored abstractor counters to: event = " + eventId + " - input = " + inputId + " - activity = " + activityId);
 	}
 

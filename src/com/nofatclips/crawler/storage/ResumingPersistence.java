@@ -101,15 +101,23 @@ public class ResumingPersistence extends StepDiskPersistence implements Dispatch
 	}
 	
 	public boolean canHasResume () {
-		if (!exists(getFileName())) return false; // GUI Tree not found
+		if (!exists(getFileName())) {
+			Log.d("nofatclips", "No session to resume: GUI Tree not found. Will start from scratch.");
+			return false; // GUI Tree not found
+		}
 		if (!exists(getActivityFileName())) throw new Error("Cannot resume previous session: state list not found.");
 		if (exists(backup(getTaskListFileName()))) {
+			Log.d("nofatclips", "Restoring backup of the task list");
 			restoreFile(getTaskListFileName());
 			if (exists(backup(getActivityFileName()))) {
+				Log.d("nofatclips", "Restoring backup of the activity list");
 				restoreFile(getActivityFileName());
 			}
 		}
-		if (!exists(getTaskListFileName())) return false;
+		if (!exists(getTaskListFileName())) {
+			Log.d("nofatclips", "No session to resume: task list not found. Will start from scratch.");
+			return false;
+		}
 		return true;
 	}
 	

@@ -1,27 +1,5 @@
 package com.nofatclips.crawler.guitree;
 
-import static com.nofatclips.crawler.Resources.ACTIVITY_DESCRIPTION_IN_SESSION;
-import static com.nofatclips.crawler.Resources.ACTIVITY_LIST_FILE_NAME;
-import static com.nofatclips.crawler.Resources.ADDITIONAL_CRITERIAS;
-import static com.nofatclips.crawler.Resources.CHECK_FOR_TRANSITION;
-import static com.nofatclips.crawler.Resources.CLASS_NAME;
-import static com.nofatclips.crawler.Resources.COMPARATOR;
-import static com.nofatclips.crawler.Resources.EXPLORE_ONLY_NEW_STATES;
-import static com.nofatclips.crawler.Resources.IN_AND_OUT_FOCUS;
-import static com.nofatclips.crawler.Resources.MAX_NUM_TRACES;
-import static com.nofatclips.crawler.Resources.MAX_TIME_CRAWLING;
-import static com.nofatclips.crawler.Resources.MAX_TRACES_IN_RAM;
-import static com.nofatclips.crawler.Resources.PACKAGE_NAME;
-import static com.nofatclips.crawler.Resources.PAUSE_AFTER_TIME;
-import static com.nofatclips.crawler.Resources.PAUSE_AFTER_TRACES;
-import static com.nofatclips.crawler.Resources.SLEEP_AFTER_EVENT;
-import static com.nofatclips.crawler.Resources.SLEEP_AFTER_RESTART;
-import static com.nofatclips.crawler.Resources.SLEEP_ON_THROBBER;
-import static com.nofatclips.crawler.Resources.TEST_LOCATION_PROVIDER;
-import static com.nofatclips.crawler.Resources.TRACE_MAX_DEPTH;
-import static com.nofatclips.crawler.Resources.USE_GPS;
-import static com.nofatclips.crawler.Resources.USE_SENSORS;
-
 import it.unina.android.hardware.SensorManager;
 
 import java.util.GregorianCalendar;
@@ -45,7 +23,9 @@ import com.nofatclips.crawler.planning.SimplePlanner;
 import com.nofatclips.crawler.planning.TraceDispatcher;
 import com.nofatclips.crawler.planning.UserFactory;
 import com.nofatclips.crawler.storage.PersistenceFactory;
-import com.nofatclips.crawler.strategy.StrategyFactory;
+import com.nofatclips.crawler.strategy.*;
+
+import static com.nofatclips.crawler.Resources.*;
 
 public class GuiTreeEngine extends Engine {
 
@@ -109,7 +89,7 @@ public class GuiTreeEngine extends Engine {
 	
 	protected void setUp ()
 	{
-		/** @author nicola amatucci */
+/** @author nicola amatucci */
 		if (USE_SENSORS)
 		{
 			SensorManager.TESTING = true;
@@ -134,8 +114,7 @@ public class GuiTreeEngine extends Engine {
 			theAutomation.locationManager.addTestProvider(TEST_LOCATION_PROVIDER, false, false, false, false, true, true, true, 0, 5);
 			theAutomation.locationManager.setTestProviderEnabled(TEST_LOCATION_PROVIDER, true);
 		}
-		/** @author nicola amatucci */
-
+/** @author nicola amatucci */		
 		
 		try {
 			super.setUp();
@@ -152,13 +131,13 @@ public class GuiTreeEngine extends Engine {
 		theGuiTree.setPackageName(PACKAGE_NAME);
 		theGuiTree.setComparationWidgets(COMPARATOR.describe());
 		theGuiTree.setInAndOutFocus(IN_AND_OUT_FOCUS);
+		theGuiTree.setSleepAfterTask(SLEEP_AFTER_TASK);
 		if (!ACTIVITY_DESCRIPTION_IN_SESSION) {
 			theGuiTree.setStateFileName(ACTIVITY_LIST_FILE_NAME);
-		}		
+		}
 	}
 	
-	
-	/** @author nicola amatucci */
+/** @author nicola amatucci */
 	@Override
 	protected void tearDown() throws Exception
 	{
@@ -167,8 +146,8 @@ public class GuiTreeEngine extends Engine {
 		
 		super.tearDown();
 	}
-	/** @author nicola amatucci */
-
+/** @author nicola amatucci */	
+	
 	public Session getNewSession() {
 		try {
 			return new GuiTree();
@@ -188,5 +167,6 @@ public class GuiTreeEngine extends Engine {
 	private UserAdapter user;
 	private BasicRestarter theRestarter;
 	private GuiTree theGuiTree;
-//	private Persistence diskWriter;	
+//	private Persistence diskWriter;
+	
 }

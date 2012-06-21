@@ -50,7 +50,7 @@ public abstract class IterativeInteractorAdapter extends InteractorAdapter {
 		ArrayList<UserEvent> events = new ArrayList<UserEvent>();
 		if (canUseWidget(w)) {
 			final int fromItem = 1; // int fromItem = Math.min(6,w.getCount());
-			final int toItem = getToItem(fromItem, w.getCount()); //Math.min (fromItem + getMaxEventsPerWidget() - 1, w.getCount());
+			final int toItem = getToItem(w, fromItem, w.getCount()); //Math.min (fromItem + getMaxEventsPerWidget() - 1, w.getCount());
 			if (toItem<fromItem) return events;
 			Log.d("nofatclips", "Handling event " + getInteractionType() + " for items [" + fromItem + "," + toItem + "] on " + w.getSimpleType() + " #" + w.getId() + " count=" + w.getCount());
 			for (int i=fromItem; i<=toItem; i++) {
@@ -60,12 +60,20 @@ public abstract class IterativeInteractorAdapter extends InteractorAdapter {
 		return events;
 	}
 
+	public int getToItem(WidgetState w, int fromItem, int toItem) {
+		return (getMaxEventsPerWidget(w)>0)?Math.min (fromItem + getMaxEventsPerWidget(w) - 1, toItem):toItem;
+	}
+
 	public int getToItem(int fromItem, int toItem) {
 		return (getMaxEventsPerWidget()>0)?Math.min (fromItem + getMaxEventsPerWidget() - 1, toItem):toItem;
 	}
 
 	public int getMaxEventsPerWidget() {
 		return this.maxEventsPerWidget;
+	}
+
+	public int getMaxEventsPerWidget(WidgetState w) {
+		return getMaxEventsPerWidget();
 	}
 
 	public void setMaxEventsPerWidget(int maxEventsPerWidget) {

@@ -55,6 +55,7 @@ public class RandomSpinnerSelector extends RandomInteractorAdapter {
 	@Override
 	public boolean canUseWidget (WidgetState w) {
 //		Log.e("nofatclips","canUseWidget: #" + w.getId() + " (" + w.getSimpleType() + ")");
+		if (getMin(w)>getMax(w)) return false;
 		return super.canUseWidget(w);
 	}
 	

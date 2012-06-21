@@ -15,5 +15,6 @@ public interface Robot {
 	public void process (Trace t);
 	public void finalize();
 	public void swapTab(String tab);
+	public void wait (int milli);
 	
 }

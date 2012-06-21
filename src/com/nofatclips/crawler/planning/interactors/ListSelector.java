@@ -2,6 +2,8 @@ package com.nofatclips.crawler.planning.interactors;
 
 import static com.nofatclips.androidtesting.model.InteractionType.LIST_SELECT;
 import static com.nofatclips.androidtesting.model.SimpleType.LIST_VIEW;
+import static com.nofatclips.androidtesting.model.SimpleType.PREFERENCE_LIST;
+import static com.nofatclips.crawler.Resources.ALL_EVENTS_ON_PREFERENCES;
 
 import com.nofatclips.androidtesting.model.WidgetState;
 import com.nofatclips.crawler.model.Abstractor;
@@ -44,6 +46,14 @@ public class ListSelector extends IterativeInteractorAdapter {
 	@Override
 	public boolean cannotIdentifyWidget (WidgetState w) {
 		return ( (w.getId().equals("-1"))  && (!doEventWhenNoId()) );
+	}
+	
+	@Override
+	public int getToItem (WidgetState w, int fromItem, int toItem) {
+		if (w.getSimpleType().equals(PREFERENCE_LIST) && ALL_EVENTS_ON_PREFERENCES) {
+			return toItem;
+		}
+		return super.getToItem (w,fromItem,toItem);
 	}
 
 	public String getInteractionType () {

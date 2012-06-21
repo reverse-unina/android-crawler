@@ -4,6 +4,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.Spinner;
 
 import com.nofatclips.crawler.model.TypeDetector;
 
@@ -38,8 +39,11 @@ public class SimpleTypeDetector implements TypeDetector {
 			return BUTTON;
 		if (type.endsWith("EditText"))
 			return EDIT_TEXT;
-		if (type.endsWith("Spinner"))
+		if (type.endsWith("Spinner")) {
+			Spinner s = (Spinner)v;
+			if (s.getCount() == 0) return EMPTY_SPINNER;
 			return SPINNER;
+		}
 		if (type.endsWith("SeekBar"))
 			return SEEK_BAR;
 		if (v instanceof RatingBar && (!((RatingBar)v).isIndicator()))
@@ -49,6 +53,11 @@ public class SimpleTypeDetector implements TypeDetector {
 		if (type.endsWith("ListView") || type.endsWith("ExpandedMenuView")) {
 			ListView l = (ListView)v;
 			if (l.getCount() == 0) return EMPTY_LIST;
+			
+			if (l.getAdapter().getClass().getName().endsWith("PreferenceGroupAdapter")) {
+				return PREFERENCE_LIST;
+			} 
+			
 			switch (l.getChoiceMode()) {
 				case ListView.CHOICE_MODE_NONE: return LIST_VIEW;
 				case ListView.CHOICE_MODE_SINGLE: return SINGLE_CHOICE_LIST;

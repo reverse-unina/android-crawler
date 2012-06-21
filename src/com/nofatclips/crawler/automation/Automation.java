@@ -1,43 +1,12 @@
 package com.nofatclips.crawler.automation;
 
-import static android.content.Context.WINDOW_SERVICE;
-import static android.view.Surface.ROTATION_0;
-import static android.view.Surface.ROTATION_180;
-import static com.nofatclips.androidtesting.model.InteractionType.ACCELEROMETER_SENSOR_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.AMBIENT_TEMPERATURE_SENSOR_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.INCOMING_CALL_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.INCOMING_SMS_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.BACK;
-import static com.nofatclips.androidtesting.model.InteractionType.CHANGE_ORIENTATION;
-import static com.nofatclips.androidtesting.model.InteractionType.CLICK;
-import static com.nofatclips.androidtesting.model.InteractionType.CLICK_ON_TEXT;
-import static com.nofatclips.androidtesting.model.InteractionType.GPS_LOCATION_CHANGE_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.GPS_PROVIDER_DISABLE_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.LIST_LONG_SELECT;
-import static com.nofatclips.androidtesting.model.InteractionType.LIST_SELECT;
-import static com.nofatclips.androidtesting.model.InteractionType.LONG_CLICK;
-import static com.nofatclips.androidtesting.model.InteractionType.MAGNETIC_FIELD_SENSOR_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.OPEN_MENU;
-import static com.nofatclips.androidtesting.model.InteractionType.ORIENTATION_SENSOR_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.SCROLL_DOWN;
-import static com.nofatclips.androidtesting.model.InteractionType.SET_BAR;
-import static com.nofatclips.androidtesting.model.InteractionType.SPINNER_SELECT;
-import static com.nofatclips.androidtesting.model.InteractionType.SWAP_TAB;
-import static com.nofatclips.androidtesting.model.InteractionType.TEMPERATURE_SENSOR_EVENT;
-import static com.nofatclips.androidtesting.model.InteractionType.TYPE_TEXT;
-import static com.nofatclips.androidtesting.model.SimpleType.BUTTON;
-import static com.nofatclips.androidtesting.model.SimpleType.MENU_ITEM;
-import static com.nofatclips.crawler.Resources.FORCE_RESTART;
-import static com.nofatclips.crawler.Resources.IN_AND_OUT_FOCUS;
-import static com.nofatclips.crawler.Resources.PRECRAWLING;
-import static com.nofatclips.crawler.Resources.SLEEP_AFTER_EVENT;
-import static com.nofatclips.crawler.Resources.SLEEP_AFTER_RESTART;
-import static com.nofatclips.crawler.Resources.SLEEP_ON_THROBBER;
-import static com.nofatclips.crawler.Resources.TEST_LOCATION_PROVIDER;
-import it.unina.android.hardware.mock.MockSensorEvent;
-import it.unina.android.hardware.mock.MockSensorEventFactory;
-import it.unina.android.hardware.mock.MockSensorManager;
+import static com.nofatclips.crawler.Resources.*;
+import static com.nofatclips.androidtesting.model.InteractionType.*;
+import static com.nofatclips.androidtesting.model.SimpleType.*;
 
+import it.unina.android.hardware.mock.*;
+
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -46,37 +15,25 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.graphics.Bitmap;
+//import android.app.Instrumentation;
+
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
-import android.view.Display;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.ScrollView;
-import android.widget.Spinner;
-import android.widget.TabHost;
-import android.widget.TextView;
+import android.view.*;
+import android.widget.*;
 
 import com.jayway.android.robotium.solo.Solo;
-import com.nofatclips.androidtesting.model.Trace;
-import com.nofatclips.androidtesting.model.Transition;
-import com.nofatclips.androidtesting.model.UserEvent;
-import com.nofatclips.androidtesting.model.UserInput;
+import com.nofatclips.androidtesting.model.*;
 import com.nofatclips.crawler.automation.sensors_utils.ActivityReflectorCache;
 import com.nofatclips.crawler.automation.sensors_utils.ActivityReflectorCacheElement;
 import com.nofatclips.crawler.automation.sensors_utils.AndroidConsoleSocket;
-import com.nofatclips.crawler.model.ActivityDescription;
-import com.nofatclips.crawler.model.Extractor;
-import com.nofatclips.crawler.model.ImageCaptor;
-import com.nofatclips.crawler.model.Restarter;
-import com.nofatclips.crawler.model.Robot;
-import com.nofatclips.crawler.model.TaskProcessor;
+import com.nofatclips.crawler.model.*;
+
+import static android.content.Context.WINDOW_SERVICE;
+import static android.view.Surface.*;
 
 // Automation implements the methods to interact with the application via the Instrumentation (Robot)
 // and to extract informations from it (Extractor); the Robotium framework is used where possible
@@ -97,11 +54,11 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 	private Robot theRobot;
 	private UserEvent currentEvent;
 	private ImageCaptor imageCaptor;
-		
-	/** @author nicola amatucci */
+
+/** @author nicola amatucci */
 	//settati da GuiTreeEngine.setUp()
 	public LocationManager locationManager;	
-	/** @author nicola amatucci */
+/** @author nicola amatucci */
 	
 	// A Trivial Extractor is provided if none is assigned
 	public Automation () {
@@ -139,11 +96,19 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 		extractState();
 		Log.i ("nofatclips", "Playing Trace " + t.getId());
 		for (Transition step: t) {
-			for (UserInput i: step) {
-				setInput(i);
-			}
-			fireEvent (step.getEvent());
+//			for (UserInput i: step) {
+//				setInput(i);
+//			}
+//			fireEvent (step.getEvent());
+			process (step);
 		}
+	}
+	
+	public void process (Transition step) {
+		for (UserInput i: step) {
+			setInput(i);
+		}
+		fireEvent (step.getEvent());		
 	}
 
 	public void finalize() {
@@ -255,6 +220,8 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 			changeOrientation();
 		} else if (interactionType.equals(CLICK_ON_TEXT)) {
 			clickOnText(value);
+		} else if (interactionType.equals(PRESS_KEY)) {
+			pressKey(value);
 		} else if (interactionType.equals(SWAP_TAB) && (value!=null)) {
 			if (v instanceof TabHost) {
 				swapTab ((TabHost)v, value);
@@ -268,9 +235,11 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 		} else if (interactionType.equals(SPINNER_SELECT)) {
 			selectSpinnerItem((Spinner)v, value);
 		} else if (interactionType.equals(TYPE_TEXT)) {
-			solo.enterText((EditText)v, value);
+			typeText((EditText)v, value);
+		} else if (interactionType.equals(WRITE_TEXT)) {
+			writeText((EditText)v, value);
 		} else if (interactionType.equals(SET_BAR)) {
-			solo.setProgressBar((ProgressBar)v, Integer.parseInt(value));		
+			solo.setProgressBar((ProgressBar)v, Integer.parseInt(value));
 			
 /** @author nicola amatucci */
 		} else  if (
@@ -294,13 +263,11 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 			AndroidConsoleSocket.sendSMS("1234", "THIS IS A TEST");
 /** @author nicola amatucci */
 		} else {
-			
-			
 			return;
 		}
 	}
-
-	/** @author nicola amatucci */	
+	
+/** @author nicola amatucci */	
 	private void fireSensorEvent(String value, String interactionType)
 	{
 		if (value != null && interactionType != null)
@@ -369,8 +336,17 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 		}
 	}
 	
-	/** @author nicola amatucci */
+/** @author nicola amatucci */
+
+	protected void typeText (EditText v, String value) {
+		solo.enterText(v, value);
+	}
 	
+	protected void writeText (EditText v, String value) {
+		typeText (v, "");
+		typeText (v, value);
+	}
+
 	// Scroll the view to the top. Only works for ListView and ScrollView. Support for GridView and others must be added
 	public void home () {
 		
@@ -487,7 +463,7 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 	}
 
 	public static boolean isInAndOutFocusEnabled() {
-		return (IN_AND_OUT_FOCUS);
+		return IN_AND_OUT_FOCUS;
 	}		
 
 	protected void requestFocus (final View v) {
@@ -498,18 +474,57 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 		});
 		sync();
 	}
+
+	public void pressKey (String keyCode) {
+		pressKey (Integer.parseInt(keyCode));
+	}
+
+	public void pressKey (int keyCode) {
+		solo.sendKey(keyCode);
+//		sendKeyDownUpLong(keyCode);
+		describeKeyEvent();
+	}
 	
-//    public void  sendKeyDownUpLong(int key) {
+    public void  sendKeyDownUpLong(final int key) {
 //		long downTime = SystemClock.uptimeMillis();
 //		long eventTime = SystemClock.uptimeMillis();
-//		KeyEvent down = new KeyEvent(downTime, eventTime, KeyEvent.ACTION_DOWN, key, 100);
+//		KeyEvent down = new KeyEvent(downTime, eventTime, KeyEvent.ACTION_DOWN, key, 0);
 //        getInstrumentation().sendKeySync(down);
+//        sync();
 //        solo.sleep(1500);//solo.sleep((int) (android.view.ViewConfiguration.getLongPressTimeout() * 2.5f));
 //		eventTime = SystemClock.uptimeMillis();
 //		KeyEvent up = new KeyEvent(downTime, eventTime, KeyEvent.ACTION_UP, key, 0);
 //		up = KeyEvent.changeFlags(down, KeyEvent.FLAG_LONG_PRESS);
 //        getInstrumentation().sendKeySync(up);
-//    }
+//        sync();
+    	final KeyEvent downEvent = new KeyEvent (KeyEvent.ACTION_DOWN, key);
+    	getInstrumentation().sendKeySync(downEvent);
+      	sync();
+
+    	try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Log.e("nofatclips", "Could not sleep for long press timeout", e);
+            return;
+        }
+    	
+//    	Log.d("nofatclips", "Prima della pausa");
+//    	solo.sleep(2000);
+//    	Log.d("nofatclips", "Dopo la pausa");
+    	
+    	for (int repetition = 0; repetition<50; repetition++) {
+	//    	getInstrumentation().sendKeySync(KeyEvent.changeFlags(upEvent, KeyEvent.FLAG_LONG_PRESS));
+    		KeyEvent newEvent = KeyEvent.changeTimeRepeat(downEvent, SystemClock.uptimeMillis(), repetition, downEvent.getFlags() | KeyEvent.FLAG_LONG_PRESS);
+	    	getInstrumentation().sendKeySync(newEvent);
+	    	sync();
+	    	solo.sleep(10);
+    	}
+
+    	final KeyEvent upEvent = new KeyEvent (KeyEvent.ACTION_UP, key);
+    	getInstrumentation().sendKeySync(upEvent);
+    	getInstrumentation().waitForIdleSync();
+    	sync();    	
+    }
 	
 	// Scroll until the view is on the screen if IN_AND_OUT_OF_FOCUS is enabled or if the force parameter is true 
 	protected void requestView (final View v, boolean force) {
@@ -538,13 +553,37 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 		solo.clickLongOnView(v);
 	}
 	
-	protected void wait (int milli) {
+	public void wait (int milli) {
 		Log.i("nofatclips", "Waiting for " + ((milli>=1000)?(milli/1000 + " sec."):(milli + " msec.")));
 		solo.sleep(milli);
 	}
 
+	// Special handling for Press Key event: there is no target widget to describe
+	private boolean describeKeyEvent () {
+		int val = Integer.parseInt(this.currentEvent.getValue());
+		String name;
+		for (Field f: android.view.KeyEvent.class.getFields()) {
+			name = f.getName();
+			if (f.getType().equals(Integer.TYPE)) {
+				try {
+					if (name.startsWith("KEYCODE_") && (f.getInt(null) == val)) {
+						this.currentEvent.setDescription(name.replaceAll("KEYCODE_", ""));
+						return true;
+					}
+				} catch (IllegalArgumentException e) {
+				} catch (IllegalAccessException e) {}
+			}
+		}
+		return false;		
+	}
+	
 	private boolean describeCurrentEvent (View v) {
 		if (this.currentEvent == null) return false; // This is probably an input, not an event
+		if (this.currentEvent.getType().equals(PRESS_KEY)) {
+			return describeKeyEvent();
+		}
+		
+		// Get text from the target widget
 		if (v instanceof TextView) {
 			String s = ((TextView)v).getText().toString();
 			this.currentEvent.setDescription(s);
@@ -574,7 +613,7 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 		ArrayList<View> viewList = (isInAndOutFocusEnabled())?solo.getViews():solo.getCurrentViews();
 		for (View w: viewList) {
 			String text = (w instanceof TextView)?": "+((TextView)w).getText().toString():"";
-			Log.d("nofatclips", "Found widget: id=" + w.getId() + " ("+ w.toString() + ")" + text); // + " in window at [" + xy[0] + "," + xy[1] + "] on screen at [" + xy2[0] + "," + xy2[1] +"]");
+			Log.d("nofatclips", "Found widget: id=" + w.getId() + " ("+ w.toString() + ")" + text); // + " in window at [" + xy[0] + "," + xy[1] + "] on screen at [" + xy2[0] + "," + xy2[1] +"]");			
 			allViews.add(w);
 			if (w.getId()>0) {
 				theViews.put(w.getId(), w); // Add only if the widget has a valid ID
@@ -651,7 +690,7 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 						fireEventOnView(v, params[0], params[2]);
 						break;
 					}
-				}; 
+				};
 				paramCount = 0;
 			} else {
 				params[paramCount] = s;
@@ -764,9 +803,9 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 	// a description of the Activity, which is basically the name and a list of widgets
 	// in the Activity.
 	
-	/** @author nicola amatucci */
+/** @author nicola amatucci */
 	ActivityReflectorCache activityCache = new ActivityReflectorCache();
-	/** @author nicola amatucci */
+/** @author nicola amatucci */
 	
 	public class TrivialExtractor implements Extractor, ImageCaptor {
 
@@ -805,8 +844,8 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 				public String toString() {
 					return getActivityName();
 				}
-				
-				/** @author nicola amatucci */
+
+/** @author nicola amatucci */
 				public boolean usesSensorsManager()
 				{
 					if (com.nofatclips.crawler.Resources.USE_SENSORS)
@@ -846,8 +885,7 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 						return false;
 					}
 				}
-				/** @author nicola amatucci */
-
+/** @author nicola amatucci */	
 			};
 		}
 		

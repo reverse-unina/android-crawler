@@ -67,6 +67,7 @@ public abstract class Engine extends ActivityInstrumentationTestCase2 implements
 			if (screenshotNeeded()) {
 				takeScreenshot(theActivity);
 			}
+			getRobot().wait(SLEEP_AFTER_TASK);
 			if (!getStrategy().checkForTransition()) continue;
 			getAbstractor().setFinalActivity (theTask, theActivity);
 			getPersistence().addTrace(theTask);
@@ -89,7 +90,14 @@ public abstract class Engine extends ActivityInstrumentationTestCase2 implements
 	
 	public boolean resume() {
 		boolean flag = ENABLE_RESUME;
-		if (!((getPersistence() instanceof ResumingPersistence) && flag)) return false;
+		if (!flag) {
+			Log.i("nofatclips", "Resume not enabled.");
+			return false;
+		}
+		if (!(getPersistence() instanceof ResumingPersistence)) {
+			Log.i("nofatclips", "The instance of Persistence does not implement Resuming.");
+			return false;
+		}
 		
 		ResumingPersistence r = (ResumingPersistence)getPersistence();
 		if (!r.canHasResume()) return false;

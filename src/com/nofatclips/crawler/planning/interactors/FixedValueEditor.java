@@ -1,6 +1,6 @@
 package com.nofatclips.crawler.planning.interactors;
 
-import static com.nofatclips.androidtesting.model.InteractionType.TYPE_TEXT;
+import static com.nofatclips.androidtesting.model.InteractionType.WRITE_TEXT;
 import static com.nofatclips.androidtesting.model.SimpleType.EDIT_TEXT;
 
 import java.util.Hashtable;
@@ -44,7 +44,7 @@ public class FixedValueEditor extends InteractorAdapter {
 	}
 
 	public String getInteractionType() {
-		return TYPE_TEXT;
+		return WRITE_TEXT;
 	}
 	
 	public void setIdValuePairs (Map<String,String> pairs) {

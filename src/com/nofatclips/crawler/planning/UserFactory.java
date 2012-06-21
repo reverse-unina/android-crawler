@@ -201,6 +201,12 @@ public class UserFactory {
 			u.addInput (addDosAndDonts(re));
 		}
 
+		if (isRequiredInput(WRITE_TEXT)) {
+			RandomWriter re = new RandomWriter(typesForInput(WRITE_TEXT));
+			re.setEventWhenNoId(false);
+			u.addInput (addDosAndDonts(re));
+		}
+
 		if (isRequiredInput(SPINNER_SELECT)) {
 			RandomSpinnerSelector rss = new RandomSpinnerSelector(typesForInput(SPINNER_SELECT));
 			rss.setEventWhenNoId(false);
