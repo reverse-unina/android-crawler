@@ -24,6 +24,7 @@ import android.widget.TabHost;
 
 import com.nofatclips.androidtesting.guitree.*;
 import com.nofatclips.androidtesting.model.*;
+import com.nofatclips.crawler.Resources;
 import com.nofatclips.crawler.model.*;
 import com.nofatclips.crawler.storage.PersistenceFactory;
 
@@ -171,12 +172,61 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 		}
 		
 /** @author nicola amatucci */
-		newActivity.setUsesSensorsManager(desc.usesSensorsManager());
-		newActivity.setUsesLocationManager(desc.usesLocationManager());
+		if ( Resources.USE_SENSORS && desc.usesSensorsManager() )
+		{
+			for (Integer s : Resources.SENSOR_TYPES)
+			{
+				switch (s)
+				{
+					case android.hardware.Sensor.TYPE_ACCELEROMETER:
+						addActivitySupportedEvent(newActivity, InteractionType.ACCELEROMETER_SENSOR_EVENT);
+						break;
+						
+					case android.hardware.Sensor.TYPE_ORIENTATION:
+						addActivitySupportedEvent(newActivity, InteractionType.ORIENTATION_SENSOR_EVENT);
+						break;
+						
+					case android.hardware.Sensor.TYPE_MAGNETIC_FIELD:
+						addActivitySupportedEvent(newActivity, InteractionType.MAGNETIC_FIELD_SENSOR_EVENT);
+						break;
+						
+					case android.hardware.Sensor.TYPE_TEMPERATURE:
+						addActivitySupportedEvent(newActivity, InteractionType.TEMPERATURE_SENSOR_EVENT);
+						break;
+				}
+			}
+		}
+		
+		if ( Resources.USE_GPS && desc.usesLocationManager() )
+		{
+			addActivitySupportedEvent(newActivity, InteractionType.GPS_LOCATION_CHANGE_EVENT);
+			addActivitySupportedEvent(newActivity, InteractionType.GPS_PROVIDER_DISABLE_EVENT);
+		}
+		
+		if ( Resources.SIMULATE_INCOMING_CALL )
+		{
+			addActivitySupportedEvent(newActivity, InteractionType.INCOMING_CALL_EVENT);
+		}
+		
+		if ( Resources.SIMULATE_INCOMING_SMS )
+		{
+			addActivitySupportedEvent(newActivity, InteractionType.INCOMING_SMS_EVENT);
+		}
+		
 /** @author nicola amatucci */
 
 		return hasDescription;
 	}
+	
+/** @author nicola amatucci */
+	private void addActivitySupportedEvent(ActivityState a, String eventType)
+	{
+		SupportedEvent supportedEvent = TestCaseSupportedEvent.createSupportedEvent(getTheSession());
+		supportedEvent.setWidgetUniqueId(SupportedEvent.GENERIC_ACTIVITY_UID);
+		supportedEvent.setEventType(eventType);
+		a.addSupportedEvent( supportedEvent );
+	}
+/** @author nicola amatucci */
 	
 	@SuppressWarnings("rawtypes")
 	private void setCount (View v, WidgetState w) {

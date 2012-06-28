@@ -95,227 +95,194 @@ public class SimplePlanner implements Planner {
 
 		
 /** @author nicola amatucci */
-		if (USE_SENSORS && a.getUsesSensorsManager())
+		//NOTA: w0 significa nessun id, quindi scateno gli eventi che non
+		//		interessano nessun widget, per esempio, che interessano
+		//		l'activity
+		for ( SupportedEvent se : a.getSupportedEventsByWidgetUniqueId(SupportedEvent.GENERIC_ACTIVITY_UID) )
 		{
-			evt = null;
-			for (Integer type : SENSOR_TYPES)
-			{	
-				float[] randomInputValues = null;					
-				float[] positiveRandomInputValues = null;
-				float[] negativeRandomInputValues = null;				
-				
-				String sensorInteractionType = null;
-				
-				switch(type)
-				{
-					case android.hardware.Sensor.TYPE_ACCELEROMETER: {
-						Log.i("nofatclips", "Creating trace for accelerometer");
-						sensorInteractionType = ACCELEROMETER_SENSOR_EVENT;
-						randomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateAccelerometerValues();
-						
-						positiveRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateAccelerometerValues();
-						for (int i = 0; i < 3; i++)
-							positiveRandomInputValues[i] = Math.abs(positiveRandomInputValues[0]);
-						
-						negativeRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateAccelerometerValues();
-						for (int i = 0; i < 3; i++)
-							negativeRandomInputValues[i] = -1 * Math.abs(positiveRandomInputValues[0]);
-						
-						break;
-					}
-					
-					case android.hardware.Sensor.TYPE_ORIENTATION: {
-						Log.i("nofatclips", "Creating trace for orientation");
-						sensorInteractionType = ORIENTATION_SENSOR_EVENT;
-						randomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateOrientationValues();
-						
-						positiveRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateOrientationValues();
-						for (int i = 0; i < 3; i++)
-							positiveRandomInputValues[i] = Math.abs(positiveRandomInputValues[0]);
-						
-						negativeRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateOrientationValues();
-						for (int i = 0; i < 3; i++)
-							negativeRandomInputValues[i] = -1 * Math.abs(positiveRandomInputValues[0]);
-						
-						break;
-					}
-					
-					case android.hardware.Sensor.TYPE_MAGNETIC_FIELD: {
-						Log.i("nofatclips", "Creating trace for magnetic field");
-						sensorInteractionType = MAGNETIC_FIELD_SENSOR_EVENT;
-						randomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateMagneticFieldValues();
-						
-						positiveRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateMagneticFieldValues();
-						for (int i = 0; i < 3; i++)
-							positiveRandomInputValues[i] = Math.abs(positiveRandomInputValues[0]);
-						
-						negativeRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateMagneticFieldValues();
-						for (int i = 0; i < 3; i++)
-							negativeRandomInputValues[i] = -1 * Math.abs(positiveRandomInputValues[0]);
-						
-						break;
-					}
-					
-					case android.hardware.Sensor.TYPE_TEMPERATURE: {
-						Log.i("nofatclips", "Creating trace for temperature");
-						sensorInteractionType = TEMPERATURE_SENSOR_EVENT;
-						randomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateTemperatureValues();
-						
-						positiveRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateTemperatureValues();
-						for (int i = 0; i < 3; i++)
-							positiveRandomInputValues[i] = Math.abs(positiveRandomInputValues[0]);
-						
-						negativeRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateTemperatureValues();
-						for (int i = 0; i < 3; i++)
-							negativeRandomInputValues[i] = -1 * Math.abs(positiveRandomInputValues[0]);
-						
-						break;
-					}						
-
-					/* TYPE_TEMPERATURE e' deprecato nelle api 14
-					
-					case android.hardware.Sensor.TYPE_AMBIENT_TEMPERATURE: {
-						Log.i("nofatclips", "Creating trace for temperature");
-						sensorInteractionType = AMBIENT_TEMPERATURE_SENSOR_EVENT;
-						sensorInputValues = it.unina.android.utils.SensorValuesGenerator.generateAmbientTemperatureValues();
-						
-						//...
-						
-						break;
-					}
-					
-					*/
-				}
-				
-				//caso in cui il sensore non e' supportato
-				if (sensorInteractionType == null) continue;
-				
-				//definisco gli input
-				Collection<UserInput> inputs = new ArrayList<UserInput>();
-				
-				if (EXCLUDE_WIDGETS_INPUTS_IN_SENSORS_EVENTS == false)
-				{
-					for (WidgetState formWidget: getInputFilter()) {
-						List<UserInput> alternatives = getFormFiller().handleInput(formWidget); 
-						UserInput inp = ((alternatives.size()>0)?alternatives.get(alternatives.size()-1):null);
-						if (inp != null) {
-							inputs.add(inp);
-						}
-					}
-				}
-				
-				//creo l'evento relativo al sensore
-				String sensorInputValueStr;
-				
-				//random
-				sensorInputValueStr = randomInputValues[0] + "|" + randomInputValues[1] + "|" + randomInputValues[2];
-				evt = getAbstractor().createEvent(null, sensorInteractionType);
-				evt.setValue(sensorInputValueStr);
-				t = getAbstractor().createStep(a, inputs, evt);
-				p.addTask(t);
-				
-				//+ + +
-				sensorInputValueStr = positiveRandomInputValues[0] + "|" + positiveRandomInputValues[1] + "|" + positiveRandomInputValues[2];
-				evt = getAbstractor().createEvent(null, sensorInteractionType);
-				evt.setValue(sensorInputValueStr);
-				t = getAbstractor().createStep(a, inputs, evt);
-				p.addTask(t);
-				
-				//- - -
-				sensorInputValueStr = negativeRandomInputValues[0] + "|" + negativeRandomInputValues[1] + "|" + negativeRandomInputValues[2];
-				evt = getAbstractor().createEvent(null, sensorInteractionType);
-				evt.setValue(sensorInputValueStr);
-				t = getAbstractor().createStep(a, inputs, evt);
-				p.addTask(t);				
-
-				//0 0 0
-				sensorInputValueStr = "0|0|0";
-				evt = getAbstractor().createEvent(null, sensorInteractionType);
-				evt.setValue(sensorInputValueStr);
-				t = getAbstractor().createStep(a, inputs, evt);
-				p.addTask(t);				
-				
-				//TODO: out-of-bounds?
-			}	
-		}
-		
-		if (USE_GPS && a.getUsesLocationManager())
-		{
-			evt = null;
-
-			//definisco gli input
-			Collection<UserInput> inputs = new ArrayList<UserInput>();
-			
-			if (EXCLUDE_WIDGETS_INPUTS_IN_SENSORS_EVENTS == false)
+			if (se.getEventType().equals(InteractionType.ACCELEROMETER_SENSOR_EVENT))
 			{
-				for (WidgetState formWidget: getInputFilter()) {
-					List<UserInput> alternatives = getFormFiller().handleInput(formWidget); 
-					UserInput inp = ((alternatives.size()>0)?alternatives.get(alternatives.size()-1):null);
-					if (inp != null) {
-						inputs.add(inp);
-					}
-				}
+				addStepsForSensor(
+						android.hardware.Sensor.TYPE_ACCELEROMETER,
+						InteractionType.ACCELEROMETER_SENSOR_EVENT,
+						a, p);
 			}
 			
-			//random
-			String locationInputValueStr = 	GpsValuesGenerator.getRandomLatitude() + "|" +
-											GpsValuesGenerator.getRandomLongitude() + "|" +
-											GpsValuesGenerator.getRandomAltitude();			
-			evt = getAbstractor().createEvent(null, GPS_LOCATION_CHANGE_EVENT);
-			evt.setValue(locationInputValueStr);
-			t = getAbstractor().createStep(a, inputs, evt);
-			p.addTask(t);	
+			else if (se.getEventType().equals(InteractionType.ORIENTATION_SENSOR_EVENT))
+			{
+				addStepsForSensor(
+						android.hardware.Sensor.TYPE_ORIENTATION,
+						InteractionType.ORIENTATION_SENSOR_EVENT,
+						a, p);
+			}			
 			
-			//+ + +
-			locationInputValueStr = GpsValuesGenerator.getRandomPositiveLatitude() + "|" +
-									GpsValuesGenerator.getRandomPositiveLongitude() + "|" +
-									GpsValuesGenerator.getRandomPositiveAltitude();			
-			evt = getAbstractor().createEvent(null, GPS_LOCATION_CHANGE_EVENT);
-			evt.setValue(locationInputValueStr);
-			t = getAbstractor().createStep(a, inputs, evt);
-			p.addTask(t);
+			else if (se.getEventType().equals(InteractionType.MAGNETIC_FIELD_SENSOR_EVENT))
+			{
+				addStepsForSensor(
+						android.hardware.Sensor.TYPE_MAGNETIC_FIELD,
+						InteractionType.MAGNETIC_FIELD_SENSOR_EVENT,
+						a, p);
+			}
 			
-			//- - -
-			locationInputValueStr = GpsValuesGenerator.getRandomNegativeLatitude() + "|" +
-									GpsValuesGenerator.getRandomNegativeLongitude() + "|" +
-									GpsValuesGenerator.getRandomNegativeAltitude();			
-			evt = getAbstractor().createEvent(null, GPS_LOCATION_CHANGE_EVENT);
-			evt.setValue(locationInputValueStr);
-			t = getAbstractor().createStep(a, inputs, evt);
-			p.addTask(t);
+			//NOTA: TYPE_TEMPERATURE e' deprecato nelle api 14: diventa TYPE_AMBIENT_TEMPERATURE
+			else if (se.getEventType().equals(InteractionType.TEMPERATURE_SENSOR_EVENT))
+			{
+				addStepsForSensor(
+						android.hardware.Sensor.TYPE_TEMPERATURE,
+						InteractionType.TEMPERATURE_SENSOR_EVENT,
+						a, p);
+			}
 			
-			//0 0 0
-			locationInputValueStr = "0|0|0";			
-			evt = getAbstractor().createEvent(null, GPS_LOCATION_CHANGE_EVENT);
-			evt.setValue(locationInputValueStr);
-			t = getAbstractor().createStep(a, inputs, evt);
-			p.addTask(t);
+			else if (se.getEventType().equals(InteractionType.GPS_LOCATION_CHANGE_EVENT))				
+			{
+				addStepsForGPS(a, p);
+			}
 			
-			//evento "disabilita provider"
-			//evt = getAbstractor().createEvent(null, GPS_PROVIDER_DISABLE_EVENT);
-			//t = getAbstractor().createStep(a, inputs, evt);
-			//p.addTask(t);
-		}
-		
-		if (SIMULATE_INCOMING_CALL)
-		{
-			evt = null;
-			evt = getAbstractor().createEvent(null, INCOMING_CALL_EVENT);
-			t = getAbstractor().createStep(a, new ArrayList<UserInput>(), evt);
-			p.addTask(t);
-		}
-		
-		if (SIMULATE_INCOMING_SMS)
-		{
-			evt = null;
-			evt = getAbstractor().createEvent(null, INCOMING_SMS_EVENT);
-			t = getAbstractor().createStep(a, new ArrayList<UserInput>(), evt);
-			p.addTask(t);
+			else if (se.getEventType().equals(InteractionType.GPS_PROVIDER_DISABLE_EVENT))				
+			{
+				//TODO
+				//evento "disabilita provider"
+				//evt = getAbstractor().createEvent(null, GPS_PROVIDER_DISABLE_EVENT);
+				//t = getAbstractor().createStep(a, inputs, evt);
+				//p.addTask(t);
+			}
+			
+			else if (se.getEventType().equals(InteractionType.INCOMING_CALL_EVENT))
+			{
+				evt = null;
+				evt = getAbstractor().createEvent(null, INCOMING_CALL_EVENT);
+				t = getAbstractor().createStep(a, new ArrayList<UserInput>(), evt);
+				p.addTask(t);
+			}
+			
+			else if (se.getEventType().equals(InteractionType.INCOMING_SMS_EVENT))
+			{
+				evt = null;
+				evt = getAbstractor().createEvent(null, INCOMING_SMS_EVENT);
+				t = getAbstractor().createStep(a, new ArrayList<UserInput>(), evt);
+				p.addTask(t);
+			}
 		}
 /** @author nicola amatucci */		
 		
 		return p;
 	}
+
+/** @author nicola amatucci */
+	private void addStepsForSensor(Integer SENSOR_TYPE, String eventType, ActivityState a, Plan p)
+	{
+		ArrayList<UserInput> inputs = new ArrayList<UserInput>();
+		
+		if (EXCLUDE_WIDGETS_INPUTS_IN_SENSORS_EVENTS == false)
+		{
+			for (WidgetState formWidget: getInputFilter()) {
+				List<UserInput> alternatives = getFormFiller().handleInput(formWidget); 
+				UserInput inp = ((alternatives.size()>0)?alternatives.get(alternatives.size()-1):null);
+				if (inp != null) {
+					inputs.add(inp);
+				}
+			}
+		}
+		
+		float[] randomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateSensorValues(SENSOR_TYPE);;					
+		float[] positiveRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateSensorValues(SENSOR_TYPE);
+		float[] negativeRandomInputValues = com.nofatclips.crawler.planning.sensors_utils.SensorValuesGenerator.generateSensorValues(SENSOR_TYPE);
+		
+		for (int i = 0; i < 3; i++)
+			positiveRandomInputValues[i] = Math.abs(positiveRandomInputValues[0]);
+		
+		for (int i = 0; i < 3; i++)
+			negativeRandomInputValues[i] = -1 * Math.abs(positiveRandomInputValues[0]);
+		
+		UserEvent evt = null;
+		Transition t = null;
+		
+		String sensorInputValueStr = null;
+		
+		//random
+		sensorInputValueStr = randomInputValues[0] + "|" + randomInputValues[1] + "|" + randomInputValues[2];
+		evt = getAbstractor().createEvent(null, eventType);
+		evt.setValue(sensorInputValueStr);
+		t = getAbstractor().createStep(a, inputs, evt);
+		p.addTask(t);
+		
+		//+ + +
+		sensorInputValueStr = positiveRandomInputValues[0] + "|" + positiveRandomInputValues[1] + "|" + positiveRandomInputValues[2];
+		evt = getAbstractor().createEvent(null, eventType);
+		evt.setValue(sensorInputValueStr);
+		t = getAbstractor().createStep(a, inputs, evt);
+		p.addTask(t);
+		
+		//- - -
+		sensorInputValueStr = negativeRandomInputValues[0] + "|" + negativeRandomInputValues[1] + "|" + negativeRandomInputValues[2];
+		evt = getAbstractor().createEvent(null, eventType);
+		evt.setValue(sensorInputValueStr);
+		t = getAbstractor().createStep(a, inputs, evt);
+		p.addTask(t);				
+
+		//0 0 0
+		sensorInputValueStr = "0|0|0";
+		evt = getAbstractor().createEvent(null, eventType);
+		evt.setValue(sensorInputValueStr);
+		t = getAbstractor().createStep(a, inputs, evt);
+		p.addTask(t);
+		
+		//TODO: out-of-bounds?
+	}
+	
+	private void addStepsForGPS(ActivityState a, Plan p)
+	{
+		ArrayList<UserInput> inputs = new ArrayList<UserInput>();
+		
+		if (EXCLUDE_WIDGETS_INPUTS_IN_SENSORS_EVENTS == false)
+		{
+			for (WidgetState formWidget: getInputFilter()) {
+				List<UserInput> alternatives = getFormFiller().handleInput(formWidget); 
+				UserInput inp = ((alternatives.size()>0)?alternatives.get(alternatives.size()-1):null);
+				if (inp != null) {
+					inputs.add(inp);
+				}
+			}
+		}
+		
+		UserEvent evt = null;
+		Transition t = null;
+		
+		//random
+		String locationInputValueStr = 	GpsValuesGenerator.getRandomLatitude() + "|" +
+										GpsValuesGenerator.getRandomLongitude() + "|" +
+										GpsValuesGenerator.getRandomAltitude();			
+		evt = getAbstractor().createEvent(null, GPS_LOCATION_CHANGE_EVENT);
+		evt.setValue(locationInputValueStr);
+		t = getAbstractor().createStep(a, inputs, evt);
+		p.addTask(t);	
+		
+		//+ + +
+		locationInputValueStr = GpsValuesGenerator.getRandomPositiveLatitude() + "|" +
+								GpsValuesGenerator.getRandomPositiveLongitude() + "|" +
+								GpsValuesGenerator.getRandomPositiveAltitude();			
+		evt = getAbstractor().createEvent(null, GPS_LOCATION_CHANGE_EVENT);
+		evt.setValue(locationInputValueStr);
+		t = getAbstractor().createStep(a, inputs, evt);
+		p.addTask(t);
+		
+		//- - -
+		locationInputValueStr = GpsValuesGenerator.getRandomNegativeLatitude() + "|" +
+								GpsValuesGenerator.getRandomNegativeLongitude() + "|" +
+								GpsValuesGenerator.getRandomNegativeAltitude();			
+		evt = getAbstractor().createEvent(null, GPS_LOCATION_CHANGE_EVENT);
+		evt.setValue(locationInputValueStr);
+		t = getAbstractor().createStep(a, inputs, evt);
+		p.addTask(t);
+		
+		//0 0 0
+		locationInputValueStr = "0|0|0";			
+		evt = getAbstractor().createEvent(null, GPS_LOCATION_CHANGE_EVENT);
+		evt.setValue(locationInputValueStr);
+		t = getAbstractor().createStep(a, inputs, evt);
+		p.addTask(t);
+	}
+/** @author nicola amatucci */		
 	
 	public Filter getEventFilter() {
 		return this.eventFilter;

@@ -6,6 +6,28 @@ package com.nofatclips.crawler.planning.sensors_utils;
  */
 public class SensorValuesGenerator
 {
+	public static float[] generateSensorValues(int SENSOR_TYPE)
+	{
+		switch (SENSOR_TYPE)
+		{
+			case android.hardware.Sensor.TYPE_ACCELEROMETER:
+				return generateAccelerometerValues();
+				
+			case android.hardware.Sensor.TYPE_ORIENTATION:
+				return generateOrientationValues();
+				
+			case android.hardware.Sensor.TYPE_MAGNETIC_FIELD:
+				return generateMagneticFieldValues();
+				
+			case android.hardware.Sensor.TYPE_TEMPERATURE:
+				return generateTemperatureValues();
+				
+			default:
+				float[] f = {0f, 0f , 0f};
+				return f;
+		}
+	}
+	
 	/*
 	 * Orientation e' un insieme di MagneticField + Accelerometer 
 	 */
