@@ -27,9 +27,9 @@ import android.widget.*;
 
 import com.jayway.android.robotium.solo.Solo;
 import com.nofatclips.androidtesting.model.*;
-import com.nofatclips.crawler.automation.sensors_utils.ActivityReflectorCache;
-import com.nofatclips.crawler.automation.sensors_utils.ActivityReflectorCacheElement;
-import com.nofatclips.crawler.automation.sensors_utils.AndroidConsoleSocket;
+import com.nofatclips.crawler.automation.utils.ActivityReflectorCache;
+import com.nofatclips.crawler.automation.utils.ActivityReflectorCacheElement;
+import com.nofatclips.crawler.automation.utils.AndroidConsoleSocket;
 import com.nofatclips.crawler.model.*;
 
 import static android.content.Context.WINDOW_SERVICE;
@@ -855,7 +855,7 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 						if (a == null || a.usesSensors == null)
 						{
 							a = new ActivityReflectorCacheElement();
-							a.usesSensors = com.nofatclips.crawler.automation.sensors_utils.ReflectorHelper.scanClassForInterface(getActivity().getClass(), "it.unina.android.hardware.SensorEventListener");
+							a.usesSensors = com.nofatclips.crawler.helpers.ReflectionHelper.scanClassForInterface(getActivity().getClass(), "it.unina.android.hardware.SensorEventListener");
 							activityCache.put( getActivity().getTitle().toString(), a );
 						}
 						return a.usesSensors;
@@ -875,7 +875,7 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 						if (a == null || a.usesLocation == null)
 						{						
 							a = new ActivityReflectorCacheElement();
-							a.usesLocation = com.nofatclips.crawler.automation.sensors_utils.ReflectorHelper.scanClassForInterface(getActivity().getClass(), "android.location.LocationListener");
+							a.usesLocation = com.nofatclips.crawler.helpers.ReflectionHelper.scanClassForInterface(getActivity().getClass(), "android.location.LocationListener");
 							activityCache.put( getActivity().getTitle().toString(), a );
 						}						
 						return a.usesLocation;

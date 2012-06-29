@@ -1,4 +1,4 @@
-package com.nofatclips.crawler.automation.sensors_utils;
+package com.nofatclips.crawler.automation.utils;
 
 import java.util.HashMap;
 

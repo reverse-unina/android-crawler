@@ -2,6 +2,7 @@ package com.nofatclips.crawler.guitree;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +26,7 @@ import android.widget.TabHost;
 import com.nofatclips.androidtesting.guitree.*;
 import com.nofatclips.androidtesting.model.*;
 import com.nofatclips.crawler.Resources;
+import com.nofatclips.crawler.helpers.ReflectionHelper;
 import com.nofatclips.crawler.model.*;
 import com.nofatclips.crawler.storage.PersistenceFactory;
 
@@ -166,6 +168,12 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 			w.setIndex(desc.getWidgetIndex(v));
 			if (detectDuplicates && newActivity.hasWidget(w)) continue;
 			newActivity.addWidget(w);
+			
+			/** @author nicola amatucci */
+			if (Resources.REFLECT_WIDGETS)
+				reflectWidget(newActivity, v, w);
+			/** @author nicola amatucci */
+			
 			for (Filter f: this.filters) {
 				f.loadItem(v, w);
 			}
@@ -219,10 +227,38 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 	}
 	
 /** @author nicola amatucci */
+	private void reflectWidget(ActivityState a, View v, TestCaseWidget w)
+	{
+		HashMap<String, Boolean> listenersMap = null;
+		
+		if (v instanceof android.opengl.GLSurfaceView)
+			listenersMap = null;
+		else if (v instanceof EditText)
+			listenersMap = ReflectionHelper.reflectEditTextListeners( (EditText) v );
+		else if (v instanceof View)
+			listenersMap = ReflectionHelper.reflectViewListeners(v);
+		
+		if ( listenersMap != null )
+			for ( String key : listenersMap.keySet() )
+				if ( listenersMap.get(key) )
+					addSupportedEvent( a, w.getUniqueId(), listenerNameToInteractionType(key) );
+	}
+	
+	private String listenerNameToInteractionType(String listenerName)
+	{
+		//TODO
+		return listenerName;
+	}
+	
 	private void addActivitySupportedEvent(ActivityState a, String eventType)
 	{
+		addSupportedEvent(a, SupportedEvent.GENERIC_ACTIVITY_UID, eventType);
+	}
+	
+	private void addSupportedEvent(ActivityState a, String uid, String eventType)
+	{
 		SupportedEvent supportedEvent = TestCaseSupportedEvent.createSupportedEvent(getTheSession());
-		supportedEvent.setWidgetUniqueId(SupportedEvent.GENERIC_ACTIVITY_UID);
+		supportedEvent.setWidgetUniqueId(uid);
 		supportedEvent.setEventType(eventType);
 		a.addSupportedEvent( supportedEvent );
 	}
