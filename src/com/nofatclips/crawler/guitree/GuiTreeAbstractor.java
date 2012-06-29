@@ -231,10 +231,9 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 	{
 		HashMap<String, Boolean> listenersMap = null;
 		
+		//TODO: casi particolari?
 		if (v instanceof android.opengl.GLSurfaceView)
 			listenersMap = null;
-		else if (v instanceof EditText)
-			listenersMap = ReflectionHelper.reflectEditTextListeners( (EditText) v );
 		else if (v instanceof View)
 			listenersMap = ReflectionHelper.reflectViewListeners(v);
 		

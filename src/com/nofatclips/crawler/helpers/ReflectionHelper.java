@@ -122,44 +122,26 @@ public class ReflectionHelper
     {
 		HashMap<String, Boolean> ret = new HashMap<String, Boolean>();
 		
-		ret.put( "OnFocusChangeListener", checkIfFieldIsSet(view, "mOnFocusChangeListener") );
-		ret.put( "OnClickListener", checkIfFieldIsSet(view, "mOnClickListener") );
-		ret.put( "OnLongClickListener", checkIfFieldIsSet(view, "mOnLongClickListener") );
-		ret.put( "OnCreateContextMenuListener", checkIfFieldIsSet(view, "mOnCreateContextMenuListener") );
-		ret.put( "OnKeyListener", checkIfFieldIsSet(view, "mOnKeyListener") );
-		ret.put( "OnTouchListener", checkIfFieldIsSet(view, "mOnTouchListener") );
+		ret.put( "OnFocusChangeListener", checkIfFieldIsSet(view, "android.view.View", "mOnFocusChangeListener") );
+		ret.put( "OnClickListener", checkIfFieldIsSet(view, "android.view.View", "mOnClickListener") );
+		ret.put( "OnLongClickListener", checkIfFieldIsSet(view, "android.view.View", "mOnLongClickListener") );
+		ret.put( "OnCreateContextMenuListener", checkIfFieldIsSet(view, "android.view.View", "mOnCreateContextMenuListener") );
+		ret.put( "OnKeyListener", checkIfFieldIsSet(view, "android.view.View", "mOnKeyListener") );
+		ret.put( "OnTouchListener", checkIfFieldIsSet(view, "android.view.View", "mOnTouchListener") );
 		
+		if (view instanceof android.widget.TextView)
+			ret.put( "OnTextChangedListener", checkIfArrayListFieldIsSet(view, "android.widget.TextView", "mListeners") );
     	return ret;
     }
 	
-	/**
-	 * Utilizzando la Reflection ottiene i listener associati ad un oggetto EditText
-	 * 
-	 * @param editText EditText da esaminare
-	 * @return 	risultato sotto forma di HashMap<String, Boolean>, che associa il nome del
-	 * 			listener alla sua effettiva esistenza
-	 */
-	public static HashMap<String, Boolean> reflectEditTextListeners(android.widget.EditText editText)
-	{
-		HashMap<String, Boolean> ret = new HashMap<String, Boolean>();
-		
-		//EditText e' una view
-		ret.putAll( reflectViewListeners(editText) );
-
-		//addTextChangedListener
-		ret.put( "OnTextChangedListener", checkIfArrayListFieldIsSet(editText, "mListeners") );
-		
-		return ret;
-	}
-	
-	public static boolean checkIfFieldIsSet(Object o, String fieldName)
+	public static boolean checkIfFieldIsSet(Object o, String baseClass, String fieldName)
 	{
 		java.lang.reflect.Field field;
 		
 		try
     	{
 			//TODO: cache
-			Class<?> viewObj = Class.forName("android.view.View");
+			Class<?> viewObj = Class.forName(baseClass);
 			field = viewObj.getDeclaredField(fieldName);
 			field.setAccessible(true);
 			
@@ -182,14 +164,14 @@ public class ReflectionHelper
 		return false;
 	}
 	
-	public static boolean checkIfArrayListFieldIsSet(Object o, String fieldName)
+	public static boolean checkIfArrayListFieldIsSet(Object o, String baseClass, String fieldName)
 	{
 		java.lang.reflect.Field field;
 		
 		try
     	{
 			//TODO: cache
-			Class<?> viewObj = Class.forName("android.view.View");
+			Class<?> viewObj = Class.forName(baseClass);
 			field = viewObj.getDeclaredField(fieldName);
 			field.setAccessible(true);
 			
