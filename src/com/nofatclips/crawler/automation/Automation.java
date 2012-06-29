@@ -1,10 +1,44 @@
 package com.nofatclips.crawler.automation;
 
-import static com.nofatclips.crawler.Resources.*;
-import static com.nofatclips.androidtesting.model.InteractionType.*;
-import static com.nofatclips.androidtesting.model.SimpleType.*;
-
-import it.unina.android.hardware.mock.*;
+import static android.content.Context.WINDOW_SERVICE;
+import static android.view.Surface.ROTATION_0;
+import static android.view.Surface.ROTATION_180;
+import static com.nofatclips.androidtesting.model.InteractionType.ACCELEROMETER_SENSOR_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.AMBIENT_TEMPERATURE_SENSOR_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.BACK;
+import static com.nofatclips.androidtesting.model.InteractionType.CHANGE_ORIENTATION;
+import static com.nofatclips.androidtesting.model.InteractionType.CLICK;
+import static com.nofatclips.androidtesting.model.InteractionType.CLICK_ON_TEXT;
+import static com.nofatclips.androidtesting.model.InteractionType.GPS_LOCATION_CHANGE_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.GPS_PROVIDER_DISABLE_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.INCOMING_CALL_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.INCOMING_SMS_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.LIST_LONG_SELECT;
+import static com.nofatclips.androidtesting.model.InteractionType.LIST_SELECT;
+import static com.nofatclips.androidtesting.model.InteractionType.LONG_CLICK;
+import static com.nofatclips.androidtesting.model.InteractionType.MAGNETIC_FIELD_SENSOR_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.OPEN_MENU;
+import static com.nofatclips.androidtesting.model.InteractionType.ORIENTATION_SENSOR_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.PRESS_KEY;
+import static com.nofatclips.androidtesting.model.InteractionType.SCROLL_DOWN;
+import static com.nofatclips.androidtesting.model.InteractionType.SET_BAR;
+import static com.nofatclips.androidtesting.model.InteractionType.SPINNER_SELECT;
+import static com.nofatclips.androidtesting.model.InteractionType.SWAP_TAB;
+import static com.nofatclips.androidtesting.model.InteractionType.TEMPERATURE_SENSOR_EVENT;
+import static com.nofatclips.androidtesting.model.InteractionType.TYPE_TEXT;
+import static com.nofatclips.androidtesting.model.InteractionType.WRITE_TEXT;
+import static com.nofatclips.androidtesting.model.SimpleType.BUTTON;
+import static com.nofatclips.androidtesting.model.SimpleType.MENU_ITEM;
+import static com.nofatclips.crawler.Resources.FORCE_RESTART;
+import static com.nofatclips.crawler.Resources.IN_AND_OUT_FOCUS;
+import static com.nofatclips.crawler.Resources.PRECRAWLING;
+import static com.nofatclips.crawler.Resources.SLEEP_AFTER_EVENT;
+import static com.nofatclips.crawler.Resources.SLEEP_AFTER_RESTART;
+import static com.nofatclips.crawler.Resources.SLEEP_ON_THROBBER;
+import static com.nofatclips.crawler.Resources.TEST_LOCATION_PROVIDER;
+import it.unina.android.hardware.mock.MockSensorEvent;
+import it.unina.android.hardware.mock.MockSensorEventFactory;
+import it.unina.android.hardware.mock.MockSensorManager;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -15,25 +49,40 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.graphics.Bitmap;
-//import android.app.Instrumentation;
-
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
-import android.view.*;
-import android.widget.*;
+import android.view.Display;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
+import android.widget.Spinner;
+import android.widget.TabHost;
+import android.widget.TextView;
 
 import com.jayway.android.robotium.solo.Solo;
-import com.nofatclips.androidtesting.model.*;
-import com.nofatclips.crawler.automation.utils.ActivityReflectorCache;
-import com.nofatclips.crawler.automation.utils.ActivityReflectorCacheElement;
+import com.nofatclips.androidtesting.model.Trace;
+import com.nofatclips.androidtesting.model.Transition;
+import com.nofatclips.androidtesting.model.UserEvent;
+import com.nofatclips.androidtesting.model.UserInput;
+import com.nofatclips.crawler.automation.utils.ActivityReflectionCache;
+import com.nofatclips.crawler.automation.utils.ActivityReflectionCacheElement;
 import com.nofatclips.crawler.automation.utils.AndroidConsoleSocket;
-import com.nofatclips.crawler.model.*;
-
-import static android.content.Context.WINDOW_SERVICE;
-import static android.view.Surface.*;
+import com.nofatclips.crawler.helpers.ReflectionHelper;
+import com.nofatclips.crawler.model.ActivityDescription;
+import com.nofatclips.crawler.model.Extractor;
+import com.nofatclips.crawler.model.ImageCaptor;
+import com.nofatclips.crawler.model.Restarter;
+import com.nofatclips.crawler.model.Robot;
+import com.nofatclips.crawler.model.TaskProcessor;
 
 // Automation implements the methods to interact with the application via the Instrumentation (Robot)
 // and to extract informations from it (Extractor); the Robotium framework is used where possible
@@ -804,7 +853,7 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 	// in the Activity.
 	
 /** @author nicola amatucci */
-	ActivityReflectorCache activityCache = new ActivityReflectorCache();
+	ActivityReflectionCache activityCache = new ActivityReflectionCache();
 /** @author nicola amatucci */
 	
 	public class TrivialExtractor implements Extractor, ImageCaptor {
@@ -850,13 +899,13 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 				{
 					if (com.nofatclips.crawler.Resources.USE_SENSORS)
 					{
-						ActivityReflectorCacheElement a = activityCache.get( getActivity().getTitle().toString() );
+						ActivityReflectionCacheElement a = activityCache.get( getActivity().getClass().getCanonicalName() );
 						
 						if (a == null || a.usesSensors == null)
 						{
-							a = new ActivityReflectorCacheElement();
+							a = new ActivityReflectionCacheElement();
 							a.usesSensors = com.nofatclips.crawler.helpers.ReflectionHelper.scanClassForInterface(getActivity().getClass(), "it.unina.android.hardware.SensorEventListener");
-							activityCache.put( getActivity().getTitle().toString(), a );
+							activityCache.put( getActivity().getClass().getCanonicalName(), a );
 						}
 						return a.usesSensors;
 					}
@@ -870,13 +919,13 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 				{
 					if (com.nofatclips.crawler.Resources.USE_GPS)
 					{
-						ActivityReflectorCacheElement a = activityCache.get( getActivity().getTitle() );
+						ActivityReflectionCacheElement a = activityCache.get( getActivity().getClass().getCanonicalName() );
 						
 						if (a == null || a.usesLocation == null)
 						{						
-							a = new ActivityReflectorCacheElement();
+							a = new ActivityReflectionCacheElement();
 							a.usesLocation = com.nofatclips.crawler.helpers.ReflectionHelper.scanClassForInterface(getActivity().getClass(), "android.location.LocationListener");
-							activityCache.put( getActivity().getTitle().toString(), a );
+							activityCache.put( getActivity().getClass().getCanonicalName(), a );
 						}						
 						return a.usesLocation;
 					}
@@ -884,6 +933,38 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 					{
 						return false;
 					}
+				}
+				
+				public boolean hasMenu()
+				{
+					ActivityReflectionCacheElement a = activityCache.get( getActivity().getClass().getCanonicalName() );
+					
+					if (a == null || a.hasMenu == null)
+					{
+						a = new ActivityReflectionCacheElement();
+						a.hasMenu =
+								ReflectionHelper.hasDeclaredMethod(getActivity().getClass(), "onCreateOptionsMenu");
+								//&& ReflectionHelper.hasDeclaredMethod(getActivity().getClass(), "onOptionsItemSelected"); //tipicamente onCreateOptionsMenu basta
+						activityCache.put( getActivity().getClass().getCanonicalName(), a );
+					}
+					
+					return a.hasMenu;
+				}
+
+				public boolean handlesKeyPress()
+				{
+					ActivityReflectionCacheElement a = activityCache.get( getActivity().getClass().getCanonicalName() );
+					
+					if (a == null || a.handlesKeyPress == null)
+					{
+						a = new ActivityReflectionCacheElement();
+						a.handlesKeyPress =
+								ReflectionHelper.hasDeclaredMethod(getActivity().getClass(), "onKeyDown");
+								//&& ReflectionHelper.hasDeclaredMethod(getActivity().getClass(), "onOptionsItemSelected"); //tipicamente onCreateOptionsMenu basta
+						activityCache.put( getActivity().getClass().getCanonicalName(), a );
+					}
+					
+					return a.handlesKeyPress;
 				}
 /** @author nicola amatucci */	
 			};

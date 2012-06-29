@@ -1,6 +1,8 @@
 package com.nofatclips.crawler.automation.utils;
 
-public class ActivityReflectorCacheElement {
+public class ActivityReflectionCacheElement {
 	public Boolean usesSensors = null;
 	public Boolean usesLocation = null;
+	public Boolean hasMenu = null;
+	public Boolean handlesKeyPress = null;
 }

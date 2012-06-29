@@ -180,6 +180,22 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 		}
 		
 /** @author nicola amatucci */
+		
+		if ( desc.hasMenu() )
+		{
+			addActivitySupportedEvent(newActivity, InteractionType.OPEN_MENU);
+		}
+		
+		if ( desc.handlesKeyPress() )
+		{
+			addActivitySupportedEvent(newActivity, InteractionType.PRESS_KEY);
+			
+			//NOTA:
+			//tipicamente OnKeyPress e' utilizzato per supportare il tasto Back
+			//per cui si puo' ipotizzare che possa essere scatenato queste evento
+			addActivitySupportedEvent(newActivity, InteractionType.BACK);
+		}
+		
 		if ( Resources.USE_SENSORS && desc.usesSensorsManager() )
 		{
 			for (Integer s : Resources.SENSOR_TYPES)
@@ -337,6 +353,7 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 	private TestCaseActivity stubActivity (ActivityState theActivity) {
 		TestCaseActivity theStub = ((TestCaseActivity)theActivity).clone();
 		theStub.resetDescription();
+		theStub.resetSupportedEvents();
 		theStub.setDescriptionId(theActivity.getId());
 		return theStub;
 	}

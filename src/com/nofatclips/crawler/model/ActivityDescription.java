@@ -11,5 +11,7 @@ public interface ActivityDescription extends Iterable<View> {
 /** @author nicola amatucci */
 	public boolean usesSensorsManager();
 	public boolean usesLocationManager();
+	public boolean hasMenu();
+	public boolean handlesKeyPress();
 /** @author nicola amatucci */
 }

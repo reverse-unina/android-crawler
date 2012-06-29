@@ -1,10 +1,13 @@
 package com.nofatclips.crawler.helpers;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.util.Log;
+
+import com.nofatclips.androidtesting.model.InteractionType;
 
 /**
  * Classe contenente metodi che utilizzano la reflection 
@@ -122,15 +125,32 @@ public class ReflectionHelper
     {
 		HashMap<String, Boolean> ret = new HashMap<String, Boolean>();
 		
-		ret.put( "OnFocusChangeListener", checkIfFieldIsSet(view, "android.view.View", "mOnFocusChangeListener") );
-		ret.put( "OnClickListener", checkIfFieldIsSet(view, "android.view.View", "mOnClickListener") );
-		ret.put( "OnLongClickListener", checkIfFieldIsSet(view, "android.view.View", "mOnLongClickListener") );
-		ret.put( "OnCreateContextMenuListener", checkIfFieldIsSet(view, "android.view.View", "mOnCreateContextMenuListener") );
-		ret.put( "OnKeyListener", checkIfFieldIsSet(view, "android.view.View", "mOnKeyListener") );
-		ret.put( "OnTouchListener", checkIfFieldIsSet(view, "android.view.View", "mOnTouchListener") );
+		ret.put( "_focusChange", checkIfFieldIsSet(view, "android.view.View", "mOnFocusChangeListener") );
+		ret.put( InteractionType.CLICK, checkIfFieldIsSet(view, "android.view.View", "mOnClickListener") );
+		ret.put( InteractionType.LONG_CLICK, checkIfFieldIsSet(view, "android.view.View", "mOnLongClickListener") );
+		ret.put( "_createContextMenu", checkIfFieldIsSet(view, "android.view.View", "mOnCreateContextMenuListener") );
+		ret.put( InteractionType.PRESS_KEY, checkIfFieldIsSet(view, "android.view.View", "mOnKeyListener") );
+		ret.put( "_touch", checkIfFieldIsSet(view, "android.view.View", "mOnTouchListener") );
 		
-		if (view instanceof android.widget.TextView)
-			ret.put( "OnTextChangedListener", checkIfArrayListFieldIsSet(view, "android.widget.TextView", "mListeners") );
+		if (view instanceof android.widget.TextView) //EditText
+		{
+			ret.put( InteractionType.TYPE_TEXT, checkIfArrayListFieldIsSet(view, "android.widget.TextView", "mListeners") );
+		}
+		
+		if (view instanceof android.widget.AbsListView) //ListView
+		{
+			ret.put( "_scrollList", checkIfFieldIsSet(view, "android.widget.AbsListView", "mOnScrollListener") );			
+			ret.put( InteractionType.LIST_SELECT, checkIfFieldIsSet(view, "android.widget.AdapterView", "mOnItemSelectedListener") );
+			ret.put("_clickListItem", checkIfFieldIsSet(view, "android.widget.AdapterView", "mOnItemClickListener") );
+			ret.put(InteractionType.LIST_LONG_SELECT, checkIfFieldIsSet(view, "android.widget.AdapterView", "mOnItemLongClickListener") );
+		}
+		
+		if (view instanceof android.view.ViewGroup)
+		{
+			ret.put( "_hierarchyChange", checkIfFieldIsSet(view, "android.view.ViewGroup", "mOnHierarchyChangeListener") );
+			ret.put( "_animation", checkIfFieldIsSet(view, "android.view.ViewGroup", "mAnimationListener") );
+		}
+		
     	return ret;
     }
 	
@@ -193,7 +213,13 @@ public class ReflectionHelper
 				 * Senza log
 				 * 		return (arrayListField.size() > 0);
 				 */
-			}			
+			}
+			else
+			{
+				//NOTA: Senza log, va eliminato questo else
+				Log.v(TAG, o.getClass().getCanonicalName() + " > " + fieldName + " FOUND | NULL" );
+				return false;
+			}
     	}
 		catch (Exception e)
 		{
@@ -201,6 +227,44 @@ public class ReflectionHelper
 		}
 		
 		Log.v(TAG, o.getClass().getCanonicalName() + " > " + fieldName + " NOT FOUND");
+		
+		return false;
+	}
+	
+	public static Object getPrivateField(String canonicalClassName, String fieldName, Object o)
+	{
+		try
+		{
+			Class<?> viewObj = Class.forName(canonicalClassName);
+			Field field = viewObj.getDeclaredField(fieldName);
+			field.setAccessible(true);
+			return field.get(o);
+		}
+		catch(Exception ex)
+		{
+			Log.e(TAG, ex.toString());
+		}
+		
+		return null;
+	}
+	
+	/* NOTA:
+	 * 
+	 * bisognerebbe controllare la firma del metodo invece che solo il nome
+	 * 
+	 */
+	public static boolean hasDeclaredMethod(Class<?> c, String methodName)
+	{
+		try
+		{
+			for ( Method m : c.getDeclaredMethods() )
+				if (m.getName().equals(methodName))
+					return true;
+		}
+		catch(Exception ex)
+		{
+			Log.e(TAG, ex.toString());
+		}
 		
 		return false;
 	}
