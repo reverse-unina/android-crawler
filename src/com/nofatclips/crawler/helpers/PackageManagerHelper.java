@@ -15,6 +15,7 @@ public class PackageManagerHelper
 	public static final String TAG = "PackageManagerHelper";
 	
 	public PackageInfo packageInfo = null;
+	private ArrayList<String> permissionCache = null;
 	
 	public PackageManagerHelper (Context ctx) throws Exception
 	{
@@ -32,15 +33,44 @@ public class PackageManagerHelper
 	
 	public ArrayList<String> getPackagePermissions()
 	{
-		ArrayList<String> ret = new ArrayList<String>();
-		
-		for (String p : packageInfo.requestedPermissions)
+		if (permissionCache == null)
 		{
-			Log.v(TAG, p);
-			ret.add(p);
+		
+			ArrayList<String> ret = new ArrayList<String>();
+			
+			for (String p : packageInfo.requestedPermissions)
+			{
+				//Log.v(TAG, p);
+				ret.add(p);
+			}
+			
+			permissionCache = ret;
 		}
-		return ret;
+		
+		return permissionCache;
 	}
+	
+	public boolean hasPermission(String permission)
+	{
+		ArrayList<String> perms = this.getPackagePermissions();
+		
+		for (String perm : perms)
+			if (perm.equals(permission))
+				return true;
+		
+		return false;
+	}
+
+	public boolean hasInternetPermission()
+	{
+		return this.hasPermission("android.permission.INTERNET");
+	}
+	
+	public boolean hasAccessMockLocationPermission()
+	{
+		return this.hasPermission("android.permission.ACCESS_MOCK_LOCATION");
+	}
+
 	
 	public boolean activityCanRotate(String activityCanonicalName)
 	{

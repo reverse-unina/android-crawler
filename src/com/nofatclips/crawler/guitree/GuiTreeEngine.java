@@ -95,8 +95,7 @@ public class GuiTreeEngine extends Engine {
 		//inizializza l'helper del PackageManager
 		try {
 			theAutomation.packageManagerHelper = new PackageManagerHelper(this.getActivity().getApplicationContext());
-			
-			theAutomation.packageManagerHelper.getPackagePermissions();
+			//theAutomation.packageManagerHelper.getPackagePermissions();
 		} catch (Exception ex) {
 			//ignored			
 		}
