@@ -76,6 +76,7 @@ import com.nofatclips.androidtesting.model.UserInput;
 import com.nofatclips.crawler.automation.utils.ActivityReflectionCache;
 import com.nofatclips.crawler.automation.utils.ActivityReflectionCacheElement;
 import com.nofatclips.crawler.automation.utils.AndroidConsoleSocket;
+import com.nofatclips.crawler.helpers.PackageManagerHelper;
 import com.nofatclips.crawler.helpers.ReflectionHelper;
 import com.nofatclips.crawler.model.ActivityDescription;
 import com.nofatclips.crawler.model.Extractor;
@@ -106,7 +107,8 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 
 /** @author nicola amatucci */
 	//settati da GuiTreeEngine.setUp()
-	public LocationManager locationManager;	
+	public LocationManager locationManager;
+	public PackageManagerHelper packageManagerHelper;
 /** @author nicola amatucci */
 	
 	// A Trivial Extractor is provided if none is assigned

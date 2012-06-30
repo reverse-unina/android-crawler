@@ -17,6 +17,7 @@ import com.nofatclips.crawler.automation.BasicRestarter;
 import com.nofatclips.crawler.automation.SimpleTypeDetector;
 import com.nofatclips.crawler.filters.AllPassFilter;
 import com.nofatclips.crawler.filters.FormFilter;
+import com.nofatclips.crawler.helpers.PackageManagerHelper;
 import com.nofatclips.crawler.model.Filter;
 import com.nofatclips.crawler.model.UserAdapter;
 import com.nofatclips.crawler.planning.SimplePlanner;
@@ -90,6 +91,16 @@ public class GuiTreeEngine extends Engine {
 	protected void setUp ()
 	{
 /** @author nicola amatucci */
+		
+		//inizializza l'helper del PackageManager
+		try {
+			theAutomation.packageManagerHelper = new PackageManagerHelper(this.getActivity().getApplicationContext());
+			
+			theAutomation.packageManagerHelper.getPackagePermissions();
+		} catch (Exception ex) {
+			//ignored			
+		}
+		
 		if (USE_SENSORS)
 		{
 			SensorManager.TESTING = true;
