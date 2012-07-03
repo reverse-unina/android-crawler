@@ -33,6 +33,7 @@ public class SimplePlanner implements Planner {
 	public Plan getPlanForActivity (ActivityState a, boolean allowSwapTabs, boolean allowGoBack) {
 		Plan p = new Plan();
 		Log.i("nofatclips", "Planning for new Activity " + a.getName());
+		
 		for (WidgetState w: getEventFilter()) {
 			Collection<UserEvent> events = getUser().handleEvent(w);			
 			for (UserEvent evt: events) {
@@ -169,7 +170,7 @@ public class SimplePlanner implements Planner {
 	}
 
 /** @author nicola amatucci */
-	private void addStepsForSensor(Integer SENSOR_TYPE, String eventType, ActivityState a, Plan p)
+	protected void addStepsForSensor(Integer SENSOR_TYPE, String eventType, ActivityState a, Plan p)
 	{
 		ArrayList<UserInput> inputs = new ArrayList<UserInput>();
 		
@@ -230,7 +231,7 @@ public class SimplePlanner implements Planner {
 		//TODO: out-of-bounds?
 	}
 	
-	private void addStepsForGPS(ActivityState a, Plan p)
+	protected void addStepsForGPS(ActivityState a, Plan p)
 	{
 		ArrayList<UserInput> inputs = new ArrayList<UserInput>();
 		
@@ -324,10 +325,12 @@ public class SimplePlanner implements Planner {
 		this.abstractor = abstractor;
 	}
 
-	private Filter eventFilter;
-	private Filter inputFilter;
-	private EventHandler user;
-	private InputHandler formFiller;
-	private Abstractor abstractor;
-
+/** @author nicola amatucci */
+	//NOTA: cambiato private -> protected
+	protected Filter eventFilter;
+	protected Filter inputFilter;
+	protected EventHandler user;
+	protected InputHandler formFiller;
+	protected Abstractor abstractor;
+/** @author nicola amatucci */	
 }

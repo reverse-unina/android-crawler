@@ -1,5 +1,6 @@
 package com.nofatclips.crawler.guitree;
 
+import static com.nofatclips.crawler.Resources.*;
 import it.unina.android.hardware.SensorManager;
 
 import java.util.GregorianCalendar;
@@ -8,10 +9,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import android.content.Context;
 import android.location.LocationManager;
+import android.util.Log;
 
 import com.nofatclips.androidtesting.guitree.GuiTree;
 import com.nofatclips.androidtesting.model.Session;
 import com.nofatclips.crawler.Engine;
+import com.nofatclips.crawler.Resources;
 import com.nofatclips.crawler.automation.Automation;
 import com.nofatclips.crawler.automation.BasicRestarter;
 import com.nofatclips.crawler.automation.SimpleTypeDetector;
@@ -21,12 +24,11 @@ import com.nofatclips.crawler.helpers.PackageManagerHelper;
 import com.nofatclips.crawler.model.Filter;
 import com.nofatclips.crawler.model.UserAdapter;
 import com.nofatclips.crawler.planning.SimplePlanner;
+import com.nofatclips.crawler.planning.SimpleReflectionPlanner;
 import com.nofatclips.crawler.planning.TraceDispatcher;
 import com.nofatclips.crawler.planning.UserFactory;
 import com.nofatclips.crawler.storage.PersistenceFactory;
-import com.nofatclips.crawler.strategy.*;
-
-import static com.nofatclips.crawler.Resources.*;
+import com.nofatclips.crawler.strategy.StrategyFactory;
 
 public class GuiTreeEngine extends Engine {
 
@@ -55,22 +57,40 @@ public class GuiTreeEngine extends Engine {
 		setAbstractor(this.guiAbstractor);
 		setSession (this.theGuiTree);
 
-		SimplePlanner p = new SimplePlanner();
+		/** @author nicola amatucci */
 
 		Filter inputFilter = new FormFilter();
-		p.setInputFilter (inputFilter);
 		this.guiAbstractor.addFilter (inputFilter);
 
 		Filter eventFilter = new AllPassFilter(); //SimpleEventFilter();
-		p.setEventFilter (eventFilter);
 		this.guiAbstractor.addFilter (eventFilter);
 		this.guiAbstractor.setTypeDetector(new SimpleTypeDetector());
-		
 		this.user = UserFactory.getUser(this.guiAbstractor);
-		p.setUser(user);
-		p.setFormFiller(user);
-		p.setAbstractor(this.guiAbstractor);
-		setPlanner (p);
+		
+		if ( Resources.PLANNER.equals("SimpleReflectionPlanner") )
+		{
+			Log.v("GuiTreeEngine", "Using SimpleReflectionPlanner");
+			SimpleReflectionPlanner p = new SimpleReflectionPlanner();
+			p.setInputFilter (inputFilter);
+			p.setEventFilter (eventFilter);
+			p.setUser(user);
+			p.setFormFiller(user);
+			p.setAbstractor(this.guiAbstractor);
+			setPlanner (p);			
+		}
+		else
+		{
+			Log.v("GuiTreeEngine", "Using SimplePlanner");
+			SimplePlanner p = new SimplePlanner();
+			p.setInputFilter (inputFilter);
+			p.setEventFilter (eventFilter);
+			p.setUser(user);
+			p.setFormFiller(user);
+			p.setAbstractor(this.guiAbstractor);
+			setPlanner (p);
+		}
+		
+		/** @author nicola amatucci */
 		
 		StrategyFactory sf = new StrategyFactory(COMPARATOR, ADDITIONAL_CRITERIAS);
 		sf.setDepth(TRACE_MAX_DEPTH);

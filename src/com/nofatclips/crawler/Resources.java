@@ -341,10 +341,13 @@ public class Resources {
 	public final static CrawlerLog LOGGER = new SessionLogger();
 
 	/** @author nicola amatucci */
-	public static boolean REFLECT_WIDGETS = true;
+	//public static String PLANNER = "SimpleReflectionPlanner"; 
+	public static String PLANNER = "SimplePlanner";
+	public static boolean REFLECT_WIDGETS = false;
+	public static boolean REFLECT_ACTIVITY_LISTENERS = false;
 	
 	//Sensor events on/off
-	public static boolean USE_SENSORS = true;
+	public static boolean USE_SENSORS = false;
 	public static boolean USE_GPS = false;
 	public static boolean EXCLUDE_WIDGETS_INPUTS_IN_SENSORS_EVENTS = true; // aggiunge input prima di scatenare l'evento "sensore"
 	

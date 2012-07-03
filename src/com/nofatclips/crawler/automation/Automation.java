@@ -952,6 +952,21 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 					
 					return a.hasMenu;
 				}
+				
+				public boolean hasOnOptionsItemSelected()
+				{
+					ActivityReflectionCacheElement a = activityCache.get( getActivity().getClass().getCanonicalName() );
+					
+					if (a == null || a.hasOnOptionsItemSelected == null)
+					{
+						a = new ActivityReflectionCacheElement();
+						a.hasOnOptionsItemSelected =
+								ReflectionHelper.hasDeclaredMethod(getActivity().getClass(), "onOptionsItemSelected");
+						activityCache.put( getActivity().getClass().getCanonicalName(), a );
+					}
+					
+					return a.hasOnOptionsItemSelected;
+				}				
 
 				public boolean handlesKeyPress()
 				{

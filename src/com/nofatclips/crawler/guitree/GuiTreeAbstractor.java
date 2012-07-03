@@ -135,6 +135,34 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 	
 	public boolean updateDescription (ActivityState newActivity, ActivityDescription desc, boolean detectDuplicates) {
 		boolean hasDescription = false;
+		
+/** @author nicola amatucci */
+		
+		if ( Resources.REFLECT_ACTIVITY_LISTENERS && desc.hasMenu() )
+		{
+			addActivitySupportedEvent(newActivity, InteractionType.OPEN_MENU);
+
+			//Verifica che al menu sia agganciato un listener
+			//if ( Resources.REFLECT_ACTIVITY_LISTENERS && desc.hasOnOptionsItemSelected() )
+		}
+		
+		if ( Resources.REFLECT_ACTIVITY_LISTENERS && desc.handlesKeyPress() )
+		{
+			addActivitySupportedEvent(newActivity, InteractionType.PRESS_KEY);
+			
+			//NOTA:
+			//tipicamente OnKeyPress e' utilizzato per supportare il tasto Back
+			//per cui si puo' ipotizzare che possa essere scatenato queste evento
+			addActivitySupportedEvent(newActivity, InteractionType.BACK);
+		}
+		
+		if ( Resources.REFLECT_ACTIVITY_LISTENERS && desc.handlesLongKeyPress() )
+		{
+			//TODO: da rendere costante
+			addActivitySupportedEvent(newActivity, "_longKeyPress");
+		}
+/** @author nicola amatucci */		
+		
 		for (View v: desc) {
 			hasDescription = true;
 			if (!v.isShown()) continue;
@@ -180,22 +208,6 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 		}
 		
 /** @author nicola amatucci */
-		
-		if ( desc.hasMenu() )
-		{
-			addActivitySupportedEvent(newActivity, InteractionType.OPEN_MENU);
-		}
-		
-		if ( desc.handlesKeyPress() )
-		{
-			addActivitySupportedEvent(newActivity, InteractionType.PRESS_KEY);
-			
-			//NOTA:
-			//tipicamente OnKeyPress e' utilizzato per supportare il tasto Back
-			//per cui si puo' ipotizzare che possa essere scatenato queste evento
-			addActivitySupportedEvent(newActivity, InteractionType.BACK);
-		}
-		
 		if ( Resources.USE_SENSORS && desc.usesSensorsManager() )
 		{
 			for (Integer s : Resources.SENSOR_TYPES)
@@ -256,14 +268,31 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 		if ( listenersMap != null )
 			for ( String key : listenersMap.keySet() )
 				if ( listenersMap.get(key) )
-					addSupportedEvent( a, w.getUniqueId(), listenerNameToInteractionType(key) );
+					addSupportedEvent( a, w.getUniqueId(), key ); //addSupportedEvent( a, w.getUniqueId(), listenerNameToInteractionType(key) );
+		
+		//MenuItem non
+		try
+		{
+			// Class.isInstance <-> instanceof
+			if (	Class.forName("com.android.internal.view.menu.IconMenuItemView").isInstance(v) &&
+					a.supportsEvent( SupportedEvent.GENERIC_ACTIVITY_UID , InteractionType.OPEN_MENU))
+			{
+				addSupportedEvent( a, w.getUniqueId(), InteractionType.CLICK );
+			}
+		}
+		catch(Exception ex)
+		{
+			//ignored
+		}		
 	}
 	
+	/*
 	private String listenerNameToInteractionType(String listenerName)
 	{
 		//TODO
 		return listenerName;
 	}
+	*/
 	
 	private void addActivitySupportedEvent(ActivityState a, String eventType)
 	{
