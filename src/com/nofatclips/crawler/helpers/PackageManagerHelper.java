@@ -71,6 +71,15 @@ public class PackageManagerHelper
 		return this.hasPermission("android.permission.ACCESS_MOCK_LOCATION");
 	}
 
+	public boolean reactsToSMSReceive()
+	{
+		return this.hasPermission("android.permission.RECEIVE_SMS");
+	}
+	
+	public boolean canSendSMS()
+	{
+		return this.hasPermission("android.permission.SEND_SMS");
+	}
 	
 	public boolean activityCanRotate(String activityCanonicalName)
 	{

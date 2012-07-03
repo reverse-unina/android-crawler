@@ -968,6 +968,22 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 					
 					return a.handlesKeyPress;
 				}
+				
+				public boolean handlesLongKeyPress()
+				{
+					ActivityReflectionCacheElement a = activityCache.get( getActivity().getClass().getCanonicalName() );
+					
+					if (a == null || a.handlesLongKeyPress == null)
+					{
+						a = new ActivityReflectionCacheElement();
+						a.handlesLongKeyPress =
+								ReflectionHelper.hasDeclaredMethod(getActivity().getClass(), "onKeyLongPress");
+								//&& ReflectionHelper.hasDeclaredMethod(getActivity().getClass(), "onOptionsItemSelected"); //tipicamente onCreateOptionsMenu basta
+						activityCache.put( getActivity().getClass().getCanonicalName(), a );
+					}
+					
+					return a.handlesLongKeyPress;
+				}
 /** @author nicola amatucci */	
 			};
 		}

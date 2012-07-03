@@ -13,5 +13,6 @@ public interface ActivityDescription extends Iterable<View> {
 	public boolean usesLocationManager();
 	public boolean hasMenu();
 	public boolean handlesKeyPress();
+	public boolean handlesLongKeyPress();
 /** @author nicola amatucci */
 }

@@ -140,8 +140,8 @@ public class ReflectionHelper
 		if (view instanceof android.widget.AbsListView) //ListView
 		{
 			ret.put( "_scrollList", checkIfFieldIsSet(view, "android.widget.AbsListView", "mOnScrollListener") );			
-			ret.put( InteractionType.LIST_SELECT, checkIfFieldIsSet(view, "android.widget.AdapterView", "mOnItemSelectedListener") );
-			ret.put("_clickListItem", checkIfFieldIsSet(view, "android.widget.AdapterView", "mOnItemClickListener") );
+			ret.put( "_selectListItem", checkIfFieldIsSet(view, "android.widget.AdapterView", "mOnItemSelectedListener") );
+			ret.put(InteractionType.LIST_SELECT, checkIfFieldIsSet(view, "android.widget.AdapterView", "mOnItemClickListener") );
 			ret.put(InteractionType.LIST_LONG_SELECT, checkIfFieldIsSet(view, "android.widget.AdapterView", "mOnItemLongClickListener") );
 		}
 		

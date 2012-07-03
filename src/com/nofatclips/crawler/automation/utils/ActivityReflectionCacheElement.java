@@ -5,4 +5,5 @@ public class ActivityReflectionCacheElement {
 	public Boolean usesLocation = null;
 	public Boolean hasMenu = null;
 	public Boolean handlesKeyPress = null;
+	public Boolean handlesLongKeyPress = null;
 }
