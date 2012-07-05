@@ -945,7 +945,10 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 					{
 						a = new ActivityReflectionCacheElement();
 						a.hasMenu =
-								ReflectionHelper.hasDeclaredMethod(getActivity().getClass(), "onCreateOptionsMenu");
+								(
+								ReflectionHelper.hasDeclaredMethod(getActivity().getClass(), "onCreateOptionsMenu")
+								|| ReflectionHelper.hasDeclaredMethod(getActivity().getClass(), "onPrepareOptionsMenu")
+								);
 								//&& ReflectionHelper.hasDeclaredMethod(getActivity().getClass(), "onOptionsItemSelected"); //tipicamente onCreateOptionsMenu basta
 						activityCache.put( getActivity().getClass().getCanonicalName(), a );
 					}

@@ -128,7 +128,7 @@ public class ReflectionHelper
 		ret.put( "_focusChange", checkIfFieldIsSet(view, "android.view.View", "mOnFocusChangeListener") );
 		ret.put( InteractionType.CLICK, checkIfFieldIsSet(view, "android.view.View", "mOnClickListener") );
 		ret.put( InteractionType.LONG_CLICK, checkIfFieldIsSet(view, "android.view.View", "mOnLongClickListener") );
-		ret.put( "_createContextMenu", checkIfFieldIsSet(view, "android.view.View", "mOnCreateContextMenuListener") );
+		ret.put( InteractionType.LONG_CLICK, checkIfFieldIsSet(view, "android.view.View", "mOnCreateContextMenuListener") );
 		ret.put( InteractionType.PRESS_KEY, checkIfFieldIsSet(view, "android.view.View", "mOnKeyListener") );
 		ret.put( "_touch", checkIfFieldIsSet(view, "android.view.View", "mOnTouchListener") );
 		
