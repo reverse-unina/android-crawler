@@ -221,6 +221,96 @@ public class UserFactory {
 		return u;
 	}
 	
+	/** @author nicola amatucci */
+	public static UserAdapter getUserForEvents (Abstractor a, String widgetType, ArrayList<String> eventTypes)
+	{
+		String[] widgetTypes = { widgetType }; 
+		UserAdapter u;
+
+		if (isUserSimple()) {
+			u = (doForceSeed())?new SimpleUser (a):new SimpleUser(a,new Random(RANDOM_SEED));
+		} else {
+			u = (doForceSeed())?new AlternativeUser (a):new AlternativeUser(a,new Random(RANDOM_SEED));
+		}
+
+		if ( eventTypes.contains(CLICK) ) {
+			Clicker c = new Clicker (widgetTypes);
+			c.setEventWhenNoId(EVENT_WHEN_NO_ID);
+			u.addEvent(addDosAndDonts(c));
+		}
+
+		if ( eventTypes.contains(LONG_CLICK) ) {
+			LongClicker l = new LongClicker (widgetTypes);
+			l.setEventWhenNoId(EVENT_WHEN_NO_ID);
+			u.addEvent(addDosAndDonts(l));
+		}
+		
+		if ( eventTypes.contains(LIST_SELECT) ) {			
+			ListSelector ls = new ListSelector (MAX_EVENTS_PER_WIDGET, widgetTypes);
+			ls.setEventWhenNoId(true);
+			u.addEvent(addDosAndDonts(ls));
+		}
+		
+		if ( eventTypes.contains(LIST_LONG_SELECT) ) {
+			ListLongClicker llc = new ListLongClicker (MAX_EVENTS_PER_WIDGET, widgetTypes);
+			llc.setEventWhenNoId(true);
+			u.addEvent(addDosAndDonts(llc));			
+		}
+		
+		if ( eventTypes.contains(SWAP_TAB) ) {
+			TabSwapper ts = new TabSwapper (widgetTypes);
+			if (TAB_EVENTS_START_ONLY) {
+				ts.setOnlyOnce(true);
+			}
+			u.addEvent(ts);			
+		}
+		
+		/*
+		for (InteractorAdapter i: ADDITIONAL_EVENTS) {
+			i.setEventWhenNoId(EVENT_WHEN_NO_ID);
+			u.addEvent(addDosAndDonts(i));			
+		}
+		*/
+		
+		if (isRequiredInput(CLICK)) {
+			Clicker c2 = new Clicker (typesForInput(CLICK));
+			c2.setEventWhenNoId(false);
+			u.addInput (addDosAndDonts(c2));
+		}
+
+		if (isRequiredInput(SET_BAR)) {
+			Slider sl = new Slider (typesForInput(SET_BAR));
+			sl.setEventWhenNoId(false);
+			u.addInput (addDosAndDonts(sl));
+		}
+		
+		if (isRequiredInput(TYPE_TEXT)) {
+			RandomEditor re = new RandomEditor(typesForInput(TYPE_TEXT));
+			re.setEventWhenNoId(false);
+			u.addInput (addDosAndDonts(re));
+		}
+
+		if (isRequiredInput(WRITE_TEXT)) {
+			RandomWriter re = new RandomWriter(typesForInput(WRITE_TEXT));
+			re.setEventWhenNoId(false);
+			u.addInput (addDosAndDonts(re));
+		}
+
+		if (isRequiredInput(SPINNER_SELECT)) {
+			RandomSpinnerSelector rss = new RandomSpinnerSelector(typesForInput(SPINNER_SELECT));
+			rss.setEventWhenNoId(false);
+			u.addInput(addDosAndDonts(rss));
+		}
+		
+		for (InteractorAdapter i: ADDITIONAL_INPUTS) {
+			i.setEventWhenNoId(false);
+			u.addInput(addDosAndDonts(i));
+		}
+		
+		return u;
+	}
+/** @author nicola amatucci */	
+	
 	@SuppressWarnings("serial")
 	public static class InteractionMap extends HashMap<String,String[]> {}
 	

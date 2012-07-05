@@ -17,6 +17,7 @@ import com.nofatclips.androidtesting.model.UserEvent;
 import com.nofatclips.androidtesting.model.UserInput;
 import com.nofatclips.androidtesting.model.WidgetState;
 import com.nofatclips.crawler.Resources;
+import com.nofatclips.crawler.model.EventHandler;
 import com.nofatclips.crawler.model.Plan;
 
 public class SimpleReflectionPlanner extends SimplePlanner {
@@ -27,38 +28,13 @@ public class SimpleReflectionPlanner extends SimplePlanner {
 		super();
 	}
 
-	private ArrayList<UserEvent> getEventsToHandle(ActivityState a, WidgetState w)
+	private Collection<UserEvent> getEventsToHandle(ActivityState a, WidgetState w)
 	{
-		ArrayList<UserEvent> ret = new ArrayList<UserEvent>();
-		
+		ArrayList<String> eventTypes = new ArrayList<String>();
 		for ( SupportedEvent evt : a.getSupportedEventsByWidgetUniqueId( w.getUniqueId() ) )
-		{
-			if (evt.getEventType().equals( InteractionType.PRESS_KEY ))
-			{
-				if ( Resources.KEY_EVENTS.length > 0 )
-				{
-					for (int keyCode: Resources.KEY_EVENTS) {
-						UserEvent event = getAbstractor().createEvent( w, evt.getEventType() );
-						event.setValue(String.valueOf(keyCode));
-						ret.add( event );
-					}
-				}
-			}
-			else if (evt.getEventType().equals( InteractionType.LIST_SELECT ))
-			{
-				for( int i = 1; i < w.getCount(); i++)
-				{
-					UserEvent event = getAbstractor().createEvent( w, evt.getEventType() );
-					event.setValue(String.valueOf(i));
-					ret.add( event );
-				}
-			}
-			else
-			{
-				ret.add( getAbstractor().createEvent( w, evt.getEventType() ) );
-			}
-		}
-		return ret;
+			eventTypes.add(evt.getEventType());
+		
+		return this.getUserForWidgetAndEvents(w.getSimpleType(), eventTypes).handleEvent(w);
 	}
 	
 	@Override
@@ -210,5 +186,9 @@ public class SimpleReflectionPlanner extends SimplePlanner {
 		}		
 		
 		return p;
+	}
+	
+	public EventHandler getUserForWidgetAndEvents(String widgetType, ArrayList<String> eventTypes) {
+		return UserFactory.getUserForEvents(getAbstractor(), widgetType, eventTypes);
 	}
 }
