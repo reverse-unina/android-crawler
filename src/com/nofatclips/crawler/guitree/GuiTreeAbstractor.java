@@ -161,6 +161,12 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 			//TODO: da rendere costante
 			addActivitySupportedEvent(newActivity, "_longKeyPress");
 		}
+		
+		if ( desc.isTabActivity() )
+		{
+			//addActivitySupportedEvent(newActivity, InteractionType.SWAP_TAB);
+			Log.v("GuiTreeAbstracor", "Activity is TabActivity");
+		}
 /** @author nicola amatucci */		
 		
 		for (View v: desc) {
@@ -270,7 +276,6 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 				if ( listenersMap.get(key) )
 					addSupportedEvent( a, w.getUniqueId(), key ); //addSupportedEvent( a, w.getUniqueId(), listenerNameToInteractionType(key) );
 		
-		//MenuItem non
 		try
 		{
 			// Class.isInstance <-> instanceof
@@ -283,7 +288,12 @@ public class GuiTreeAbstractor implements Abstractor, FilterHandler, SaveStateLi
 		catch(Exception ex)
 		{
 			//ignored
-		}		
+		}
+		
+		if (v instanceof android.widget.TabHost)
+		{
+			addSupportedEvent( a, w.getUniqueId(), InteractionType.SWAP_TAB );
+		}
 	}
 	
 	/*

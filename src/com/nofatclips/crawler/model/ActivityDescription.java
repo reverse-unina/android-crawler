@@ -15,5 +15,6 @@ public interface ActivityDescription extends Iterable<View> {
 	public boolean hasOnOptionsItemSelected();
 	public boolean handlesKeyPress();
 	public boolean handlesLongKeyPress();
+	public boolean isTabActivity();
 /** @author nicola amatucci */
 }

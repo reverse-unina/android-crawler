@@ -70,6 +70,8 @@ public class SimpleTypeDetector implements TypeDetector {
 			return IMAGE_VIEW;
 		if (type.endsWith("LinearLayout"))
 			return LINEAR_LAYOUT;
+		if (type.endsWith("RelativeLayout"))
+			return RELATIVE_LAYOUT;		
 		if ((v instanceof WebView) || type.endsWith("WebView"))
 			return WEB_VIEW;
 		if (type.endsWith("TwoLineListItem"))

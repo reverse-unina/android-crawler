@@ -7,4 +7,5 @@ public class ActivityReflectionCacheElement {
 	public Boolean hasOnOptionsItemSelected = null;
 	public Boolean handlesKeyPress = null;
 	public Boolean handlesLongKeyPress = null;
+	public Boolean isTabActivity = null;
 }

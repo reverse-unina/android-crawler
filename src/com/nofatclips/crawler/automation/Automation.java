@@ -1002,6 +1002,20 @@ public class Automation implements Robot, Extractor, TaskProcessor, ImageCaptor 
 					
 					return a.handlesLongKeyPress;
 				}
+				
+				public boolean isTabActivity() 
+				{
+					ActivityReflectionCacheElement a = activityCache.get( getActivity().getClass().getCanonicalName() );
+					
+					if (a == null || a.isTabActivity == null)
+					{
+						a = new ActivityReflectionCacheElement();
+						a.isTabActivity = ReflectionHelper.isDescendant(getActivity().getClass(), android.app.TabActivity.class);
+						activityCache.put( getActivity().getClass().getCanonicalName(), a );
+					}
+					
+					return a.isTabActivity;
+				}
 /** @author nicola amatucci */	
 			};
 		}

@@ -269,6 +269,12 @@ public class ReflectionHelper
 		return false;
 	}
 	
+	public static boolean isDescendant(Class<?> descendant, Class<?> anchestor)
+	{
+		return anchestor.isAssignableFrom(descendant);
+	}
+	
+	
 	/*
 	private static void enableAllViewClassListenerFields()
 	{
