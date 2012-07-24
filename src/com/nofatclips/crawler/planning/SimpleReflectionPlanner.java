@@ -38,55 +38,7 @@ public class SimpleReflectionPlanner extends SimplePlanner {
 		}
 		return this.getUserForWidgetAndEvents(w.getSimpleType(), eventTypes).handleEvent(w);
 	}
-	
-	/*
-    private ArrayList<UserEvent> getEventsToHandle(ActivityState a, WidgetState w)
-    {
-            ArrayList<UserEvent> ret = new ArrayList<UserEvent>();
-            
-            for ( SupportedEvent evt : a.getSupportedEventsByWidgetUniqueId( w.getUniqueId() ) )
-            {
-            		if (evt.getEventType().startsWith("_"))
-            			continue;
-            	
-                    if (evt.getEventType().equals( InteractionType.PRESS_KEY ))
-                    {
-                            if ( Resources.KEY_EVENTS.length > 0 )
-                            {
-                                    for (int keyCode: Resources.KEY_EVENTS) {
-                                            UserEvent event = getAbstractor().createEvent( w, evt.getEventType() );
-                                            event.setValue(String.valueOf(keyCode));
-                                            ret.add( event );
-                                    }
-                            }
-                    }
-                    else if (evt.getEventType().equals( InteractionType.LIST_SELECT ))
-                    {
-                            for( int i = 1; i < w.getCount(); i++)
-                            {
-                                    UserEvent event = getAbstractor().createEvent( w, evt.getEventType() );
-                                    event.setValue(String.valueOf(i));
-                                    ret.add( event );
-                            }
-                    }
-                    else if (evt.getEventType().equals( InteractionType.LIST_LONG_SELECT ))
-                    {
-                        for( int i = 1; i < w.getCount(); i++)
-                        {
-                                UserEvent event = getAbstractor().createEvent( w, evt.getEventType() );
-                                event.setValue(String.valueOf(i));
-                                ret.add( event );
-                        }
-                    }
-                    else
-                    {
-                    	ret.add( getAbstractor().createEvent( w, evt.getEventType() ) );
-                    }
-            }
-            return ret;
-    }
-	*/
-	
+		
 	@Override
 	public Plan getPlanForActivity (ActivityState a, boolean allowSwapTabs, boolean allowGoBack) {
 		Plan p = new Plan();

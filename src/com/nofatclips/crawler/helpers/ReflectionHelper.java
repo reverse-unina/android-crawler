@@ -143,6 +143,15 @@ public class ReflectionHelper
 			ret.put( "_selectListItem", checkIfFieldIsSet(view, "android.widget.AdapterView", "mOnItemSelectedListener") );
 			ret.put(InteractionType.LIST_SELECT, checkIfFieldIsSet(view, "android.widget.AdapterView", "mOnItemClickListener") );
 			ret.put(InteractionType.LIST_LONG_SELECT, checkIfFieldIsSet(view, "android.widget.AdapterView", "mOnItemLongClickListener") );
+			
+			//longClickPatch
+			if ( ret.get(InteractionType.LONG_CLICK) == true ) 
+			{
+				ret.remove(InteractionType.LONG_CLICK);
+				
+				if ( ret.get(InteractionType.LIST_LONG_SELECT) == false )
+					ret.put(InteractionType.LIST_LONG_SELECT, true);
+			}
 		}
 		
 		if (view instanceof android.view.ViewGroup)
