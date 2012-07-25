@@ -130,7 +130,7 @@ public class ReflectionHelper
 		ret.put( InteractionType.LONG_CLICK, checkIfFieldIsSet(view, "android.view.View", "mOnLongClickListener") );
 		ret.put( InteractionType.LONG_CLICK, checkIfFieldIsSet(view, "android.view.View", "mOnCreateContextMenuListener") );
 		ret.put( InteractionType.PRESS_KEY, checkIfFieldIsSet(view, "android.view.View", "mOnKeyListener") );
-		ret.put( "_touch", checkIfFieldIsSet(view, "android.view.View", "mOnTouchListener") );
+		ret.put( InteractionType.CLICK, checkIfFieldIsSet(view, "android.view.View", "mOnTouchListener") );
 		
 		if (view instanceof android.widget.TextView) //EditText
 		{

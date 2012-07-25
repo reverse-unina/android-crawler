@@ -265,12 +265,10 @@ public class UserFactory {
 			u.addEvent(ts);			
 		}
 		
-		/*
 		for (InteractorAdapter i: ADDITIONAL_EVENTS) {
 			i.setEventWhenNoId(EVENT_WHEN_NO_ID);
 			u.addEvent(addDosAndDonts(i));			
 		}
-		*/
 		
 		if (isRequiredInput(CLICK)) {
 			Clicker c2 = new Clicker (typesForInput(CLICK));
