@@ -126,11 +126,18 @@ public class ReflectionHelper
 		HashMap<String, Boolean> ret = new HashMap<String, Boolean>();
 		
 		ret.put( "_focusChange", checkIfFieldIsSet(view, "android.view.View", "mOnFocusChangeListener") );
-		ret.put( InteractionType.CLICK, checkIfFieldIsSet(view, "android.view.View", "mOnClickListener") );
-		ret.put( InteractionType.LONG_CLICK, checkIfFieldIsSet(view, "android.view.View", "mOnLongClickListener") );
-		ret.put( InteractionType.LONG_CLICK, checkIfFieldIsSet(view, "android.view.View", "mOnCreateContextMenuListener") );
+		
+		ret.put( InteractionType.CLICK,
+					checkIfFieldIsSet(view, "android.view.View", "mOnClickListener")
+				||	checkIfFieldIsSet(view, "android.view.View", "mOnTouchListener")
+		);
+		
+		ret.put( InteractionType.LONG_CLICK,
+					checkIfFieldIsSet(view, "android.view.View", "mOnLongClickListener")
+				||	checkIfFieldIsSet(view, "android.view.View", "mOnCreateContextMenuListener")
+		);
+		
 		ret.put( InteractionType.PRESS_KEY, checkIfFieldIsSet(view, "android.view.View", "mOnKeyListener") );
-		ret.put( InteractionType.CLICK, checkIfFieldIsSet(view, "android.view.View", "mOnTouchListener") );
 		
 		if (view instanceof android.widget.TextView) //EditText
 		{
