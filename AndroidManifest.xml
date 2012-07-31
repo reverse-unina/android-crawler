@@ -10,6 +10,13 @@
     <uses-library android:name="android.test.runner" />
     </application>
     
+    <!-- necessario per GPS -->
     <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
+    
+    <!-- necessario per socket che comunica con ddms -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    
+    <!-- necessario per intent relativi alla fotocamera -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     
 </manifest>
