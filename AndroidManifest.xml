@@ -8,6 +8,21 @@
     <application android:icon="@drawable/icon" android:label="@string/app_name">
 
     <uses-library android:name="android.test.runner" />
+    
+       <activity android:name="it.unina.android.hardware.intent.CaptureImageIntent">
+            <intent-filter>
+                <action android:name="it.unina.android.hardware.intent.CaptureImageIntent" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+       </activity>
+       
+       <activity android:name="it.unina.android.hardware.intent.RecordVideoIntent">
+            <intent-filter>
+                <action android:name="it.unina.android.hardware.intent.RecordVideoIntent" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+       </activity>
+           
     </application>
     
     <!-- necessario per GPS -->
