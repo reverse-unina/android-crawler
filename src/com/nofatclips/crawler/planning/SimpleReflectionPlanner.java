@@ -65,10 +65,17 @@ public class SimpleReflectionPlanner extends SimplePlanner {
 		Transition t;
 		
 		boolean BACK_BUTTON_EVENT = Resources.BACK_BUTTON_EVENT;
-		boolean MENU_EVENTS = false;
+		boolean MENU_EVENTS = Resources.MENU_EVENTS;
 		boolean SCROLL_DOWN_EVENT = Resources.SCROLL_DOWN_EVENT;
 		boolean ORIENTATION_EVENTS = Resources.ORIENTATION_EVENTS;
-		boolean SUPPORTS_KEY_EVENTS = false;
+		boolean SUPPORTS_KEY_EVENTS = (Resources.KEY_EVENTS.length > 0);
+		
+		//TODO: da provare
+		if (Resources.REFLECT_ACTIVITY_LISTENERS)
+		{
+			MENU_EVENTS = false;
+			SUPPORTS_KEY_EVENTS = false;
+		}
 		
 		for (SupportedEvent se : a.getSupportedEventsByWidgetUniqueId( SupportedEvent.GENERIC_ACTIVITY_UID ) )
 		{
